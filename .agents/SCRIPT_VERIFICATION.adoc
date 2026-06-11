@@ -36,7 +36,7 @@ _Derniere mise a jour_ : Session 064 (01 mai 2026) — Audit contexte EAGER/LAZY
 
 | docker/magic-stick-cli/Dockerfile | Fix checksums : noms de fichiers correspondants aux checksums (lazygit + just) | OK (Session 049)
 | docker/magic-stick-cli/Dockerfile | **EPIC 11 convergence** : ARG centralises (8 vars alignes avec versions.sh), uv pinne tarball, ARG dupliques retires, bump 0.1.12, COPY libs | OK (Session 051)
-| docker/magic-stick-cli/docker-compose.yml | OK | N/A | docker-compose de test local (image cheroliv/magic-stick-cli:latest, bind mount, 4G) | Session 063
+| docker/magic-stick-cli/docker-compose.yml | OK | N/A | docker-compose de test local (image cccpeducation/magic-stick-cli:latest, bind mount, 4G) | Session 063
 |===
 
 == Tasks Gradle (groupes iso + docker)

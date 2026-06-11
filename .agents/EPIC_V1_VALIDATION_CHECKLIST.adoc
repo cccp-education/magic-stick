@@ -1,5 +1,5 @@
 = EPIC V-1 — Validation Physique ISO
-:author: cheroliv
+:author: cccp-education
 :date: 2026-05-22
 :status: EN COURS
 :toc: left

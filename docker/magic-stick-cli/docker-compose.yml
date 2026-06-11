@@ -1,6 +1,6 @@
 services:
   magic-stick-cli:
-    image: cheroliv/magic-stick-cli:latest
+    image: cccpeducation/magic-stick-cli:latest
     stdin_open: true
     tty: true
     working_dir: /workspace

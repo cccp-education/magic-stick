@@ -226,6 +226,13 @@ fun parseDockerhubCreds(): Pair<String, String>? {
     return if (user.isNotEmpty() && token.isNotEmpty()) user to token else null
 }
 
+fun parseDockerhubJwt(): String? {
+    if (!dockerhubCredsFile.exists()) return null
+    val line = dockerhubCredsFile.readLines().find { it.trimStart().startsWith("jwt:") }
+    val value = line?.substringAfter("jwt:")?.trim()?.removeSurrounding("\"")?.removeSurrounding("'") ?: ""
+    return value.ifEmpty { null }
+}
+
 tasks.register<org.gradle.api.tasks.Exec>("dockerHubLogin") {
     group = "docker"
     description = "Authenticate to Docker Hub using dockerhub-creds.yml (local only, never CI/CD)"
@@ -239,7 +246,7 @@ tasks.register<org.gradle.api.tasks.Exec>("dockerBuildCli") {
     group = "docker"
     description = "Build magic-stick-cli Docker image locally"
     val creds = parseDockerhubCreds()
-    val repo = if (!creds?.first.isNullOrEmpty()) "${creds?.first}/magic-stick-cli" else "cheroliv/magic-stick-cli"
+    val repo = if (!creds?.first.isNullOrEmpty()) "${creds?.first}/magic-stick-cli" else "cccpeducation/magic-stick-cli"
     commandLine("docker", "buildx", "build",
         "--file", "docker/magic-stick-cli/Dockerfile",
         "--tag", "${repo}:${magicStickVersion}",
@@ -259,4 +266,42 @@ tasks.register<org.gradle.api.tasks.Exec>("dockerPushCli") {
         "--tag", "${repo}:${magicStickVersion}",
         "--tag", "${repo}:latest",
         ".")
+}
+
+tasks.register("dockerHubJwt") {
+    group = "docker"
+    description = "Generate a JWT token from Docker Hub credentials for Hub API calls. Override with -Pjwt=..."
+    val creds = parseDockerhubCreds()
+    val cliJwt = project.findProperty("jwt") as? String
+    onlyIf { creds != null || !cliJwt.isNullOrEmpty() }
+    doLast {
+        val jwt = if (!cliJwt.isNullOrEmpty()) {
+            cliJwt
+        } else {
+            val json = """{"username":"${creds?.first}","password":"${creds?.second}"}"""
+            val tmpFile = File.createTempFile("dhub-", ".json")
+            tmpFile.writeText(json)
+            try {
+                val process = ProcessBuilder("curl", "-s", "-X", "POST",
+                    "-H", "Content-Type: application/json",
+                    "-d", "@${tmpFile.absolutePath}",
+                    "https://hub.docker.com/v2/users/login/")
+                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                    .start()
+                val output = process.inputStream.bufferedReader().readText()
+                output.substringAfter("\"token\":\"").substringBefore("\"")
+            } finally {
+                tmpFile.delete()
+            }
+        }
+        val lines = dockerhubCredsFile.readLines().toMutableList()
+        val jwtIdx = lines.indexOfFirst { it.trimStart().startsWith("jwt:") }
+        if (jwtIdx >= 0) {
+            lines[jwtIdx] = "  jwt: \"$jwt\""
+        } else {
+            lines.add("  jwt: \"$jwt\"")
+        }
+        dockerhubCredsFile.writeText(lines.joinToString("\n") + "\n")
+        logger.lifecycle("JWT stored in ${dockerhubCredsFile.absolutePath}")
+    }
 }

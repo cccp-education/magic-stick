@@ -166,7 +166,7 @@ __
 * Le workflow devra executer une authentification Ollama (ex: `ollama login` ou setup de cle) dans le conteneur avant toute requete vers le cloud.
 * L'image contient les outils de manipulation de la reponse (Python, uv, xh, jq, etc.).
 * Taille minimisee (pas de layer UI/XFCE, pas de boot loader, pas de kernel).
-* Publiée sur **Docker Hub** (`cheroliv/magic-stick-cli`), publiquement accessible.
+* Publiée sur **Docker Hub** (`cccpeducation/magic-stick-cli`), publiquement accessible.
 
 ==== Taches
 
@@ -296,3 +296,18 @@ Deux options :
 * [ ] Creer des `.desktop` files pour le menu XFCE (Heroic, Prism, RetroArch, Itch)
 * [ ] Tester le lancement depuis le live boot (GPU, controleurs)
 * [ ] Verifier l'integration dans test-software.sh
+
+'''
+
+=== EPIC 14 : Migration CCCP — Bakery site statique
+
+**Statut** : A FAIRE
+**Priorite** : MOYENNE
+**Contexte** : Le site statique magic-stick (via bakery-gradle + JBake) utilise encore l'ancien compte cheroliv. À migrer après finalisation de bakery-gradle.
+
+==== Taches
+
+* [ ] Mettre a jour `site.yml` avec les credentials cccp-education
+* [ ] Mettre a jour le secret GitHub `BAKERY_GRADLE_PLUGIN` avec le nouveau `site.yml`
+* [ ] Mettre a jour le secret GitHub `GH_PAT` si necessaire
+* [ ] Verifier le deploiement gh-pages

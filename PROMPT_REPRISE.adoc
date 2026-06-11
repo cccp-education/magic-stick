@@ -1,29 +1,21 @@
-= PROMPT REPRISE — magic-stick Session 076
-:date: 2026-05-28
+= PROMPT REPRISE — magic-stick Session 077
+:date: 2026-06-11
 
 == Mission en cours
 
-EPIC V-1 — Validation Physique ISO → v0.1.14.
-Session 075 : retour -kernel/-initrd/-append avec live-media=/dev/sr0.
-Commit a728d4f push. CI/CD en cours.
+Session 076 : Migration CCCP Docker Hub + SourceForge terminee.
 
-== Derniere action
+== A faire (prochaine session)
 
-Fix smoke test : `-cdrom + -kernel + -initrd + -append`
-avec live-media=/dev/sr0, cow_backend=tmpfs, rootdelay=10.
-
-== A faire
-
-1. Verifier build CI/CD — https://github.com/cheroliv/magic-stick/actions/
-2. Si PASS → git tag v0.1.14 && git push origin v0.1.14
-3. Si FAIL → debug : verifier serial log, tester `live-media=/dev/sr1`, `findiso=`
-4. Telecharger ISO depuis SourceForge
-5. sudo ./scripts/flash.sh /dev/sda
-6. Boot physique + checklist EPIC V-1
+1. EPIC 14 — Migration CCCP Bakery site statique
+   - Mettre a jour site.yml
+   - Secret BAKERY_GRADLE_PLUGIN
+   - Secret GH_PAT
+   - gh-pages deploy
 
 == Rappels
 
 . ZERO commit/push sans permission
-. Mot de passe sudo: /home/cheroliv/workspace/mdp.txt
-. USB: /dev/sda (partitions: system_a, system_b, persistence)
-. 50 builds CI/CD consecutifs FAIL (smoke test). A728d4f est le fix.
+. Remote : cccp-education/magic-stick
+. Docker Hub : cccpeducation/magic-stick-cli
+. SourceForge : cccp-education@frs.sourceforge.net

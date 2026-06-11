@@ -236,13 +236,13 @@ La partition Persistence utilise `persistence.conf` avec `/ union` pour sauvegar
 
 == Image Docker CLI
 
-Une image Docker `cheroliv/magic-stick-cli` est disponible sur Docker Hub. Elle reproduit la stack logicielle CLI du chroot (sans GUI) pour les jobs CI/CD et Ollama Cloud.
+Une image Docker `cccpeducation/magic-stick-cli` est disponible sur Docker Hub. Elle reproduit la stack logicielle CLI du chroot (sans GUI) pour les jobs CI/CD et Ollama Cloud.
 
 === Pull
 
 [source,bash]
 ----
-docker pull cheroliv/magic-stick-cli:latest
+docker pull cccpeducation/magic-stick-cli:latest
 ----
 
 === docker-compose.yml
@@ -251,7 +251,7 @@ docker pull cheroliv/magic-stick-cli:latest
 ----
 services:
   magic-stick-cli:
-    image: cheroliv/magic-stick-cli:latest
+    image: cccpeducation/magic-stick-cli:latest
     stdin_open: true
     tty: true
     working_dir: /workspace
@@ -270,7 +270,7 @@ services:
 jobs:
   my-job:
     runs-on: ubuntu-latest
-    container: cheroliv/magic-stick-cli:latest
+    container: cccpeducation/magic-stick-cli:latest
     steps:
       - uses: actions/checkout@v4
       - run: python3 script.py
@@ -283,7 +283,7 @@ jobs:
 ATTENTION: Ne jamais stocker de credentials dans les layers de l'image.
 [source,bash]
 ----
-docker run --rm -e OLLAMA_DEVICE_KEY="$OLLAMA_DEVICE_KEY" cheroliv/magic-stick-cli ollama login
+docker run --rm -e OLLAMA_DEVICE_KEY="$OLLAMA_DEVICE_KEY" cccpeducation/magic-stick-cli ollama login
 ----
 
 === Distinction avec le systeme live

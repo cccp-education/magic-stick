@@ -536,7 +536,7 @@ CMD ["bash"]
 ARG BASE_IMAGE=magic-stick:base
 FROM ${BASE_IMAGE} as cli
 
-LABEL maintainer="cheroliv"
+LABEL maintainer="cccp-education"
 LABEL description="Magic Stick CLI — GitHub Actions CI/CD"
 LABEL version="0.1.12"
 
@@ -608,7 +608,7 @@ tasks.register<Exec>("dockerBuildCli") {
     dependsOn("dockerBuildBase")
 
     val creds = parseDockerhubCreds()
-    val repo = if (!creds?.first.isNullOrEmpty()) "${creds?.first}/magic-stick-cli" else "cheroliv/magic-stick-cli"
+    val repo = if (!creds?.first.isNullOrEmpty()) "${creds?.first}/magic-stick-cli" else "cccpeducation/magic-stick-cli"
 
     commandLine("docker", "buildx", "build",
         "--file", "docker/magic-stick-cli/Dockerfile",

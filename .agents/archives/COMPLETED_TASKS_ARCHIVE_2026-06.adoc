@@ -1,0 +1,33 @@
+= Archive des Taches Terminee — Juin 2026
+
+== Session 076 — Migration CCCP : Docker Hub + SourceForge
+
+**Date** : 11 juin 2026
+**Type** : migration
+**Score** : 7/10
+
+=== Taches
+
+* [OK] Migration code : build.yml, build.gradle.kts, README*, docker-compose.yml, site.yml, welcome.sh (cheroliv → cccp-education)
+* [OK] Creation vault centralise configuration/settings/dockerhub.yml
+* [OK] Ajout tache Gradle dockerHubJwt (ecriture yaml + override -Pjwt=)
+* [OK] Secrets GitHub : DOCKERHUB_USERNAME, DOCKERHUB_TOKEN, SF_USERNAME, SF_SSH_KEY, SF_KNOWN_HOSTS
+* [OK] Ajout EPIC 14 dans BACKLOG.adoc (bakery site statique - en attente)
+
+=== Fichiers modifies
+
+| `.github/workflows/build.yml` | Tags Docker Hub |
+| `build.gradle.kts` | dockerHubJwt task |
+| `README.adoc`, `README_FR.adoc` | Tags Docker Hub |
+| `docker/magic-stick-cli/docker-compose.yml` | Tag Docker Hub |
+| `site.yml` | Credentials GitHub |
+| `dockerhub-creds.yml` | username + jwt |
+| `.gitignore` | dockerhub-jwt.txt |
+| `BACKLOG.adoc` | EPIC 14 |
+| `config/live-build/includes.chroot/usr/local/bin/magic-stick-welcome.sh` | docs URL |
+| `.agents/SCRIPT_VERIFICATION.adoc` | tag Docker Hub |
+| `.agents/EPIC_V1_VALIDATION_CHECKLIST.adoc` | author |
+| `COPILOT_CODE_REVIEW.adoc` | maintainer + tag |
+| `.agents/sessions/063-epic8-dockerhub-doc.adoc` | tag Docker Hub |
+| `.agents/sessions/071-fix-ci-cd-iso-build.adoc` | repo URL |
+| `PROMPT_REPRISE.adoc` | GitHub URL |

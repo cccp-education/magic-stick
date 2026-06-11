@@ -4,6 +4,7 @@ _Derniere mise a jour_ : 2026-05-28 (session 075)
 
 |===
 | # | Date | Type | Sujet | Score
+| 076 | 11 juin 2026 | migration | Migration CCCP : Docker Hub (cheroliv→cccpeducation) + SourceForge (cheroliv→cccp-education). Secrets GitHub, dockerHubJwt task, vault dockerhub.yml | 7/10
 | 075 | 28 mai 2026 | fix+ci | Retour -kernel/-initrd/-append avec live-media=/dev/sr0, cow_backend=tmpfs, rootdelay=10. Commit a728d4f push. | 6/10
 | 074 | 23 mai 2026 | fix+ci | Full ISO boot via -cdrom (abandon -kernel/-initrd + initrd patching), +console=ttyS0,115200 build, detection login prompt | 6/10
 | 073 | 23 mai 2026 | fix+ci | Fix Initrd Patching CI/CD — boucle candidates decompresseurs sans `file -b`, validation cpio magic bytes, multi-segment initrd handling | 7/10

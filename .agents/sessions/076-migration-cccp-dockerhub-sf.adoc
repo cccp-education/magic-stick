@@ -1,0 +1,26 @@
+= Session 076 — Migration CCCP : Docker Hub + SourceForge
+:date: 2026-06-11
+:type: migration
+:score: 7/10
+
+== Sujet
+
+Migration de l'identite cheroliv vers cccp-education/cccpeducation pour Docker Hub et SourceForge sur le projet magic-stick.
+
+== Taches effectuees
+
+* [x] Migration code : build.yml, build.gradle.kts, README*, docker-compose.yml, site.yml, welcome.sh
+* [x] Creation compte Docker Hub cccpeducation + repo magic-stick-cli
+* [x] Verification token Docker Hub (ancien token cheroliv invalide → remplace)
+* [x] Creation vault centralise configuration/settings/dockerhub.yml (2 comptes)
+* [x] Ajout tache Gradle dockerHubJwt avec ecriture dans dockerhub-creds.yml + override -Pjwt=
+* [x] Secrets GitHub : DOCKERHUB_USERNAME, DOCKERHUB_TOKEN, SF_USERNAME, SF_SSH_KEY, SF_KNOWN_HOSTS
+* [x] Ajout EPIC 14 dans BACKLOG.adoc (bakery site statique - en attente)
+
+== Probleme rencontre
+
+* Token Docker Hub de l'ancien compte encore present → login echoue. Corrige apres generation nouveau token.
+
+== Prochaine session
+
+* EPIC 14 — Migration CCCP Bakery site statique (apres finalisation bakery-gradle)

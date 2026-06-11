@@ -157,14 +157,14 @@ jobs:
           file: ./docker/magic-stick-cli/Dockerfile
           push: true
           tags: |
-            cheroliv/magic-stick-cli:${{ steps.version.outputs.version }}
-            cheroliv/magic-stick-cli:latest
+            cccpeducation/magic-stick-cli:${{ steps.version.outputs.version }}
+            cccpeducation/magic-stick-cli:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Test Docker image
         run: |
-          docker run --rm "cheroliv/magic-stick-cli:${{ steps.version.outputs.version }}" bash -c "
+          docker run --rm "cccpeducation/magic-stick-cli:${{ steps.version.outputs.version }}" bash -c "
             set -e
             ollama --version
             python3 --version

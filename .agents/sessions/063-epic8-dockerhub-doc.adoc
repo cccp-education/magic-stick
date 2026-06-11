@@ -12,7 +12,7 @@ Session 063 — Suite session 062. L'utilisateur demande de continuer avec EPIC 
 == Actions
 
 . Creation `docker/magic-stick-cli/docker-compose.yml` :
-  - Image `cheroliv/magic-stick-cli:latest`
+  - Image `cccpeducation/magic-stick-cli:latest`
   - stdin/tty ouverts, bind mount `./:/workspace`, limite 4G memoire
 . README.adoc enrichi : section Docker CLI complete (pull, docker-compose.yml, GitHub Actions job, auth Ollama Cloud, distinction live system)
 . README_FR.adoc enrichi : meme contenu en francais

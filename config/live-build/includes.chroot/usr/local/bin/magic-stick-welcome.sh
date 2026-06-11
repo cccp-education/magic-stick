@@ -23,4 +23,4 @@ zenity --info \
         "<b>Super + F</b>  Fichiers\n"
         "<b>Super + B</b>  Firefox\n"
         "<b>Super + 1..4</b>  Bureaux\n\n"
-        "Documentation: <a href='https://cheroliv.github.io/magic-stick/'>https://cheroliv.github.io/magic-stick/</a>" || true
+        "Documentation: <a href='https://cccp-education.github.io/magic-stick/'>https://cccp-education.github.io/magic-stick/</a>" || true

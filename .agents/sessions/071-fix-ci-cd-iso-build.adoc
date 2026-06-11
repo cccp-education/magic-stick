@@ -30,8 +30,8 @@ Build CI/CD ISO v0.1.14 en echec : Gradle problems-report + test software failur
 
 [source,shell]
 ----
-gh run view <run-id> --repo cheroliv/magic-stick --log --job <job-id>
-gh api repos/cheroliv/magic-stick/actions/runs/<run-id>/jobs
+gh run view <run-id> --repo cccp-education/magic-stick --log --job <job-id>
+gh api repos/cccp-education/magic-stick/actions/runs/<run-id>/jobs
 ----
 
 == Lecons
