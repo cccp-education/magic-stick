@@ -57,7 +57,6 @@ if [[ ! -f "${BUILD_DIR}/config/common" ]]; then
         --mirror-binary http://archive.ubuntu.com/ubuntu \
         --archive-areas 'main restricted universe multiverse' \
         --apt-secure false \
-        --debootstrap-options "--no-check-gpg" \
         --bootappend-live 'boot=casper live-media=/dev/sr0 cow_backend=tmpfs username=magic hostname=magic-stick locales=fr_FR.UTF-8 keyboard-layouts=fr quiet splash console=ttyS0,115200' \
         --iso-volume "Magic Stick ${MAGIC_STICK_VERSION}" \
         --iso-publisher 'Magic Stick' \
