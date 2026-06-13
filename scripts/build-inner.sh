@@ -53,7 +53,7 @@ if [[ ! -f "${BUILD_DIR}/config/common" ]]; then
         --mirror-bootstrap http://archive.ubuntu.com/ubuntu \
         --mirror-binary http://archive.ubuntu.com/ubuntu \
         --archive-areas 'main restricted universe multiverse' \
-        --bootappend-live 'boot=casper live-media=/dev/sr0 username=magic hostname=magic-stick locales=fr_FR.UTF-8 keyboard-layouts=fr quiet splash console=ttyS0,115200' \
+        --bootappend-live 'boot=casper live-media=/dev/sr0 cow_backend=tmpfs username=magic hostname=magic-stick locales=fr_FR.UTF-8 keyboard-layouts=fr quiet splash console=ttyS0,115200' \
         --iso-volume "Magic Stick ${MAGIC_STICK_VERSION}" \
         --iso-publisher 'Magic Stick' \
         --iso-application 'Magic Stick Live System'
