@@ -15,7 +15,8 @@ ISO_NAME="magic-stick_${MAGIC_STICK_VERSION}.iso"
 
 echo "=== Inner build (container) v${MAGIC_STICK_VERSION} ==="
 
-mkdir -p /tmp && chmod 1777 /tmp
+export TMPDIR="${BUILD_DIR}/tmp"
+mkdir -p "$TMPDIR" && chmod 1777 "$TMPDIR"
 
 # ============================================================
 # External downloads cache
