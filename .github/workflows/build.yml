@@ -50,7 +50,6 @@ jobs:
           context: .
           file: ./Dockerfile
           load: true
-          no-cache: true
           tags: magic-stick:builder
 
       - name: Build ISO
@@ -104,7 +103,7 @@ jobs:
 
       - name: Upload ISO artifact
         uses: actions/upload-artifact@v4
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: success() || !startsWith(github.ref, 'refs/heads/main')
         with:
           name: magic-stick_iso
           path: build/magic-stick_${{ env.MAGIC_STICK_VERSION }}.iso*
