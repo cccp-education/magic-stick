@@ -50,6 +50,7 @@ jobs:
           context: .
           file: ./Dockerfile
           load: true
+          no-cache: true
           tags: magic-stick:builder
 
       - name: Build ISO
