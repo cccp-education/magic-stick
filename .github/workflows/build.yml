@@ -123,6 +123,7 @@ jobs:
           echo "$SF_KNOWN_HOSTS" > ~/.ssh/known_hosts
           ISO_NAME="magic-stick_${MAGIC_STICK_VERSION}.iso"
           SHA_FILE="${ISO_NAME}.sha256"
+          ssh ${SF_USERNAME}@frs.sourceforge.net "mkdir -p /home/frs/project/magic-stick/magic-stick/" || true
           rsync -avz --progress \
             "build/${ISO_NAME}" \
             "build/${SHA_FILE}" \
