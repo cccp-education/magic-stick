@@ -1,0 +1,8 @@
+= Rapport — Session 054 — Mise à jour BACKLOG + TODO
+:session: 054
+:date: 2026-06-13
+:type: maintenance
+
+== Modifications
+- BACKLOG.adoc : EPICs terminés marqués, ISO fixes ajoutés
+- TODO.adoc : nettoyé (items obsolètes archivés)

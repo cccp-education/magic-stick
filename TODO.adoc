@@ -1,12 +1,14 @@
 = TODO — Magic Stick
+:last_update: 2026-06-13 — Nettoyé (items obsolètes archivés)
 
-_Pense-bete informel — Pas un plan, pas une liste de priorites. Pour les priorites, voir BACKLOG.adoc_
+_Pense-bête informel. Pour les priorités, voir BACKLOG.adoc_
 
-* Investiguer quel outil est le mieux adapte : live-build vs cubic vs custom
-* Tester le boot d'une ISO Xubuntu dans QEMU avant de customiser
-* Verifier la taille minimale d'une cle USB (8 Go? 16 Go? 32 Go?)
-* Regarder comment SystemRescue ou Tails gerent leur partitionnement
-* Etudier overlayfs pour la persistence (alternative a la partition dediee)
-* Ajouter support UEFI + BIOS legacy
-* Considerer l'ajout de Ventoy comme bootloader alternatif
-* Script de creation de cle en masse (N cles identiques pour formation)
+* Tester le boot BIOS sur cle USB réelle
+* Tester le boot UEFI sur cle USB réelle
+* Tester les smoke tests QEMU en live boot USB
+* Tester l'image Docker CLI comme conteneur GitHub Actions
+* EPIC 7 : Auto-update site de doc + IA release notes
+* EPIC 10 : Applications Docker (BigBlueButton, Rahoot, Formbricks, etc.)
+* EPIC 12 : Vinegar + Sober (Roblox)
+* EPIC 13 : Plateformes jeu (Heroic, Prism, RetroArch, Itch)
+* EPIC 14 : Migration CCCP site statique

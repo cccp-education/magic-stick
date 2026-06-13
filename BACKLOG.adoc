@@ -1,313 +1,81 @@
-= Backlog -- Magic Stick
+= Backlog — Magic Stick
+:last_update: 2026-06-13 (Session 053+ — ISO fixes)
 
-__
+'''
 **Objectif** : Suivi des issues et taches en cours
-**Derniere mise a jour** : Session 053 (30 avril 2026)
-__
-
 '''
 
-== EPIC Prioritaires
-
-=== EPIC 1 : Initialisation projet
-
-**Statut** : TERMINE
-**Priorite** : HAUTE
-
-==== Taches
-
-* [x] Creer la structure de repertoires
-* [x] Creer le systeme de contexte agent (AGENT.adoc, INDEX.adoc, etc.)
-* [x] Initialiser le depot git
-* [x] Creer les scripts de base (build.sh, flash.sh, update-system.sh, verify.sh)
-* [x] Ajouter un .gitignore adapte
-* [x] README minimal
-
-=== EPIC 2 : Build ISO Xubuntu de base
-
-**Statut** : EN COURS
-**Priorite** : HAUTE
-**Contraintes** :
-* **Zero sudo** : tout en Docker, rien a installer sur l'hote
-* **CI/CD GitHub Actions** : build, verify, test boot, release automatique
-* **Publication** : ISO sur SourceForge via rsync sur tag v*
-* **Zero build local** : build via CI/CD uniquement, lire les logs, corriger, push, reiterer
-
-==== Taches
-
-* [x] Configurer live-build pour Xubuntu minimal
-* [x] Ajouter les hooks chroot de base
-* [x] Intégrer ubiquity (installateur)
-* [x] Ajouter QEMU + OVMF dans le Docker builder
-* [x] Scripts verify.sh et test-boot.sh dans Docker
-* [x] Workflow GitHub Actions (build + verify + test + release)
-* [x] Premiere ISO generee (CI/CD vert — session 010)
-* [x] Build ISO via CI/CD — GRUB modules corriges (session 013)
-* [x] Release v0.1.0 sur SourceForge (session 013-014)
-* [x] Integrer SourceForge + rsync pour hebergement ISO — valide session 016 (build v0.1.3 vert)
-* [ ] Tester le boot BIOS sur cle USB reelle
-* [ ] Ajouter support UEFI (hook deja present, a valider sur reel)
-* [ ] Tester le boot UEFI sur cle USB reelle
-* [ ] Auto-update du site de doc lors d'un deploiement (version + lien SourceForge)
-* [ ] Generer les notes de version (changelog/features) via IA lors d'un release
-
-=== EPIC 3 : Partition A/B + Persistence
-
-**Statut** : TERMINE
-**Priorite** : HAUTE
+== EPICs Terminés
 
-==== Taches
-
-* [x] Creer le schema de partitionnement (GPT : A + B + persistence) — script test-ab-partition.sh
-* [x] Configurer GRUB pour le boot A/B — update-system.sh generate_grub_cfg + install_grub
-* [x] Implementer le script update-system.sh — complet avec flag --yes
-* [x] Tester le rollback (boot sur ancienne partition) — test local loopback OK (session 018)
-* [-] Tester le rollback en CI/CD — SKIP : runners GitHub non-privileged (session 020). Mock test A/B en remplacement (syntaxe + presence scripts)
-* [x] Valider que les donnees persistence survivent a une mise a jour — CI/CD mock OK (Session 021), full loopback en local (Docker privileged)
-
-=== EPIC 4 : Logiciels (Ollama, Docker, Podman, SDKMAN, NVM, pnpm, Python 3.14.4, uv, ripgrep, fd, fzf, lazygit, xh, just, flatpak, JetBrains Toolbox)
-
-**Statut** : EN COURS
-**Priorite** : MOYENNE
-**Contraintes** :
-* **JDK 25 Temurin** obligatoire via SDKMAN (version exacte du JDK dans le chroot)
+=== EPIC 1 : Initialisation projet ✅
+=== EPIC 3 : Partition A/B + Persistence ✅
+=== EPIC 5 : Personnalisation XFCE ✅
+=== EPIC 6 : Script de mise à jour système A/B ✅
+=== EPIC 8 : Dockerisation CLI (artefact parallèle) ✅
+=== EPIC 9 : Éditeurs de code (VS Code, gh CLI) ✅
+=== EPIC 11 : Pinning versions chroot + refactoring patterns ✅
 
-=====Tiches
-
-* [x] Installer Docker dans le chroot live-build
-* [x] Installer Podman dans le chroot live-build
-* [x] Installer Ollama dans le chroot
-* [x] Installer NVM (Node.js Version Manager) dans le chroot
-* [x] Installer pnpm dans le chroot
-* [x] Installer Python 3.14.4 dans le chroot
-* [x] Installer uv Python package manager dans le chroot
-* [x] Installer SDKMAN + JDK 25 Temurin dans le chroot
-* [x] Installer les outils reseau (nmap, iperf3, wireshark)
-* [x] Installer les outils de recherche (ripgrep, fd, fzf)
-* [x] Installer les outils git (lazygit)
-* [x] Installer les outils HTTP (xh)
-* [x] Installer just command runner dans le chroot
-* [x] Installer Flatpak dans le chroot
-* [x] Installer JetBrains Toolbox App dans le chroot
-* [x] Installer zsh + oh-my-zsh / starship dans le chroot
-* [x] CI/CD test-software.sh : checks binaires squashfs pour tous les outils (nmap, iperf3, wireshark, JDK, python3.14 fixes session 059)
-* [x] Smoke tests QEMU : service systemd conditionnel smoke-test.service + mode --smoke dans test-boot.sh + task Gradle isoTestSmoke (session 059)
-* [x] Valider les smoke tests en CI/CD (lancement `./gradlew isoTestSmoke` apres build)
-* [ ] Tester en live boot reel sur cle USB
-
-=== EPIC 5 : Personnalisation XFCE
-
-**Statut** : TERMINE
-**Priorite** : BASSE (session 017 : cosmetique, repriorise)
-
-==== Taches
-
-* [x] Theme et fond d'ecran custom
-* [x] Raccourcis clavier standardises
-* [x] Panel XFCE preconfigure
-* [x] Scripts de demarrage automatique
-* [x] Menu Applications personnalise
-
-=== EPIC 9 : Editeurs de code (dans /opt/)
+== EPIC 2 : Build ISO Xubuntu de base 🔄 EN COURS
 
-**Statut** : TERMINE
-**Priorite** : MOYENNE
-**Contexte** : REVERSAL session 037 — le maintien d'IDE dans `/home/user/apps/` est une mauvaise idee sur cle bootable installable. Les editeurs retournent dans `/opt/` comme le reste de la stack systeme. EPIC termine session 062.
+**Priorité** : HAUTE
 
-==== Taches
+=== Réalisé
+* [x] live-build configuré, hooks chroot, ubiquity, QEMU+OVMF
+* [x] CI/CD GitHub Actions (build + verify + test + release)
+* [x] Première ISO générée (session 010)
+* [x] Release v0.1.0 sur SourceForge
+* [x] GRUB modules corrigés (session 013)
+* [x] Fix casper overlay (cow_backend=tmpfs, overlay module initramfs) — sessions récentes
+* [x] Fix QEMU boot (patch casper script)
 
-* [x] VS Code : installation tarball dans /opt/VSCode-linux-x64/ + script /usr/local/bin/vscode-update.sh (modele https://cheroliv.com/blog/2026/0103)
-* [x] gh CLI : installation dans /opt/gh/ + symlink /usr/local/bin/gh
+=== Restant
+* [ ] Tester boot BIOS sur cle USB réelle
+* [ ] Ajouter/supporter UEFI
+* [ ] Tester boot UEFI sur cle USB réelle
+* [ ] Auto-update du site de doc lors d'un déploiement
+* [ ] Générer notes de version via IA
 
-=== EPIC 6 : Script de mise a jour systeme A/B
+== EPIC 4 : Logiciels (Ollama, Docker, SDKMAN, NVM, etc.) 🔄 EN COURS
 
-**Statut** : TERMINE
-**Priorite** : HAUTE
+**Priorité** : MOYENNE
 
-==== Taches
+=== Réalisé
+* [x] Docker, Podman, Ollama, NVM, pnpm, Python 3.14.4, uv, SDKMAN+JDK25
+* [x] ripgrep, fd, fzf, lazygit, xh, just, Flatpak, JetBrains Toolbox, zsh+starship
+* [x] CI/CD test-software.sh checks binaires squashfs
+* [x] Smoke tests QEMU (service systemd, mode --smoke, task Gradle isoTestSmoke)
+* [x] CI/CD smoke tests validés
 
-* [x] Script update-system.sh complet
-* [x] Detection de la partition active
-* [x] Ecriture ISO sur partition inactive
-* [x] Inversion flag de boot
-* [x] Verification et rollback automatique
-* [x] Option --dry-run
+=== Restant
+* [ ] Tester en live boot réel sur cle USB
 
-=== EPIC 7 : Site de doc auto + IA release notes
+== EPIC 7 : Site de doc auto + IA release notes
 
-**Statut** : A FAIRE
-**Priorite** : BASSE (session 017 : repriorise, polish non critique)
+**Priorité** : BASSE
+* [ ] Auto-updater site doc (version + lien SourceForge)
+* [ ] Générer notes de version via IA lors d'un release
 
-==== Taches
+== EPIC 10 : Applications Docker supplémentaires
 
-* [ ] Auto-updater le site de doc lors d'un deploiement (version + lien SourceForge)
-* [ ] Generer les notes de version (changelog/features) via IA lors d'un release
+**Priorité** : BASSE
+* [ ] BigBlueButton, Rahoot, Formbricks, Grist, Cal.com, Nextcloud, Stalwart
+* [ ] Reverse proxy (Traefik/NPM)
+* [ ] Script start-apps.sh + intégration live-build
 
-=== EPIC 8 : Dockerisation CLI (artefact parallele)
+== EPIC 12 : Vinegar + Sober (Roblox) 🔲 A FAIRE
 
-**Statut** : TERMINE
-**Priorite** : MOYENNE
-**Nature** : Facette secondaire / build parallele. Ne modifie en **rien** les objectifs de la Magic Stick en tant que systeme live bootable (EPICs 1-7). L'image Docker est construite independamment de l'ISO en reproduisant la meme stack logicielle CLI.
+**Priorité** : BASSE
+* [ ] Installer Vinegar (Flatpak ou binaire)
+* [ ] Installer Sober (Flatpak ou binaire)
+* [ ] .desktop files + test boot
 
-**Objectif** : Produire une image Docker utilisable en mode terminal (sans UI) a partir d'un `Dockerfile` dedie qui installe la meme suite d'outils que le chroot live-build. Cible : utiliser l'image comme conteneur de job dans les GitHub Actions pour executer des taches IA (requetes Ollama client, notamment vers Ollama Cloud) avec tout le toolchain Magic Stick (Python, uv, xh, SDKMAN, etc.).
+== EPIC 13 : Plateformes de jeu 🔲 A FAIRE
 
-==== Architecture
+**Priorité** : BASSE
+* [ ] Heroic Games Launcher, Prism Launcher, RetroArch, Itch.io
 
-* Un `Dockerfile` (dans un dossier `docker/` ou `containers/magic-stick-cli/` ) base sur `ubuntu:24.04` (ou la meme base que le live-build).
-* Reutilisation des scripts d'installation logicielle via COPY + RUN (par exemple les memes hooks chroot adaptes).
-* Un `docker-compose.yml` optionnel pour tests locaux ou services adjacents.
-* Le build est declenche en parallele du build ISO dans le workflow CI/CD, pas comme sous-produit de celui-ci.
+== EPIC 14 : Migration CCCP — Bakery site statique 🔲 A FAIRE
 
-==== Contraintes specifiques GitHub Actions
-
-* L'image doit contenir le **binaire Ollama complet** (client local), car Ollama Cloud requiert un client authentifie avec une cle de device.
-* **Exclusion des outils graphiques** : l'image Docker n'embarque ni bureau XFCE, ni JetBrains Toolbox, ni VS Code, ni aucun logiciel GUI du chroot live-build. Tous les autres outils CLI du chroot (SDKMAN, JDK, Python, uv, Docker engine, Podman, NVM, pnpm, ripgrep, fd, fzf, lazygit, xh, httpie, just, nmap, iperf3, zsh, etc.) sont repris dans le `Dockerfile`.
-* La **cle de device Ollama** ne doit JAMAIS figurer dans l'image ni ses layers. Injection exclusivement au runtime via secret GitHub Actions (`secrets.OLLAMA_DEVICE_KEY` ou variable d'env securisee).
-* Le workflow devra executer une authentification Ollama (ex: `ollama login` ou setup de cle) dans le conteneur avant toute requete vers le cloud.
-* L'image contient les outils de manipulation de la reponse (Python, uv, xh, jq, etc.).
-* Taille minimisee (pas de layer UI/XFCE, pas de boot loader, pas de kernel).
-* Publiée sur **Docker Hub** (`cccpeducation/magic-stick-cli`), publiquement accessible.
-
-==== Taches
-
-* [x] Creer le `Dockerfile` de base (`ubuntu:24.04`) qui reproduit la meme installation logicielle que le chroot (memes hooks/scripts adaptes).
-* [x] Creer un `docker-compose.yml` de test local optionnel.
-* [ ] Build et validation de l'image en local (`docker build`, `docker run -it` pour verifier la presence d'Ollama, Python, uv, SDKMAN, etc.).
-* [x] Credentials Docker Hub : creer `dockerhub-creds.yml` locale avec username/token, ajoute a `.gitignore`.
-* [x] Script local de push : creer `scripts/dockerhub-push.sh` qui parse `dockerhub-creds.yml` sans exposer de token en CLI.
-* [x] Task Gradle : ajouter dans `build.gradle.kts` une task `dockerHubLogin` (seulement si credentials presents) et `dockerPushCli`.
-* [x] CI/CD Docker Hub : reevaluer `build.yml` pour soit utiliser `secrets.DOCKERHUB_TOKEN`, soit documenter le pattern local via `dockerhub-creds.yml`. Le job `docker-hub` utilise deja `secrets.DOCKERHUB_TOKEN` et pousse sur Docker Hub tag par tag.
-* [ ] Tester le push local : executer `scripts/dockerhub-push.sh` apres un `docker build` manuel de `docker/magic-stick-cli/Dockerfile`.
-* [ ] Tester l'image comme conteneur de job GitHub Actions factice : verifier que `ollama --version`, `python3`, `uv`, et `xh` fonctionnent.
-* [ ] Tester l'authentification Ollama Cloud depuis le conteneur avec une cle injectee.
-* [x] Documenter l'usage dans le README (exemple de `Dockerfile`, `docker-compose.yml`, et workflow YAML, distinction avec le systeme live).
-
-=== EPIC 10 : Applications Docker supplémentaires
-
-**Statut** : A FAIRE
-**Priorite** : BASSE
-**Contexte** : Applications web/services auto-hébergées packagées en Docker pour enrichir le Magic Stick. Demande utilisateur session 047.
-
-==== Architecture
-
-* Chaque service = un sous-dossier `docker/apps/<nom>/` avec son `docker-compose.yml`
-* Volume de données persistant dans la partition Persistence (bind mount `/mnt/persistence/docker-apps/`)
-* Reverse proxy optionnel (Traefik ou Nginx Proxy Manager) pour gérer les ports
-* Réseau Docker partagé `magic-stick-apps`
-
-==== Services envisagés
-
-* [ ] **BigBlueButton** — Visioconférence open source (https://github.com/bigbluebutton/docker)
-* [ ] **Rahoot** — Clone Kahoot! open source (https://github.com/Ralex91/Rahoot)
-* [ ] **Formbricks** — Formulaires et enquêtes (https://github.com/formbricks/formbricks)
-* [ ] **Grist** — Tableur open source type Airtable (https://github.com/gristlabs/grist-core#using-grist)
-* [ ] **Cal.com DIY** — Planification de rendez-vous (https://github.com/calcom/cal.diy)
-* [ ] **Nextcloud** — Cloud personnel (https://github.com/nextcloud/docker)
-* [ ] **Rclone** — Synchronisation cloud (https://hub.docker.com/r/rclone/rclone)
-* [ ] **Stalwart** — Serveur mail (https://github.com/stalwartlabs/stalwart)
-
-==== Taches technique
-
-* [ ] Creer `docker/apps/` avec une structure standardisée (docker-compose + .env.example + README)
-* [ ] Choisir et configurer le reverse proxy (Traefik ou NPM)
-* [ ] Script `scripts/start-apps.sh` pour lancer/stopper l'ensemble des services
-* [ ] Integration dans l'installateur live-build (hook chroot : installation de Docker Compose)
-* [ ] Documentation d'architecture dans `AGENT.adoc`
-
-'''
-
-=== EPIC 11 : Pinning versions chroot + refactoring patterns
-
-**Statut** : TERMINE
-**Priorite** : HAUTE
-**Contexte** : Revue de code Copilot session 049. Les hooks chroot `060-install-chroot-software.chroot` et `docker/magic-stick-cli/Dockerfile` telechargent des versions dynamiques via l'API GitHub (`/releases/latest`). Chaque build peut installer des versions differentes, rendant l'ISO non reproductible.
-
-==== Problemes identifies
-
-* [x] **Pinning versions chroot** : Remplacer tous les `curl https://api.github.com/repos/.../releases/latest` dans `060-install-chroot-software.chroot` par des versions fixes (ARG/variables). Outils concernes : ripgrep, fd, fzf, lazygit, xh, just, opencode, uv, starship, SDKMAN, graphify.
-* [x] **Centraliser get_arch_suffix()** : Factoriser les 5+ blocs `case "$(uname -m)"` dupliques dans chaque installation binaire en une unique fonction `get_arch_suffix()` ou un sourcing de `scripts/lib/arch.sh`.
-* [x] **arch.sh extrait et deploye** : `scripts/lib/arch.sh` cree en session 050, deploye dans `/usr/local/lib/magic-stick/arch.sh` via includes.chroot.
-* [x] **Traps robustes pour montages temporaires** : `trap ... EXIT` deja presents dans `update-system.sh` (7 fonctions avec RETURN EXIT), `build-inner.sh` (cleanup_build_inner). Verifies session 053.
-* [x] **Checksums binaires chroot** : Checksums SHA256 lazygit + just ajoutes dans hook chroot en session 053. Valides dans CI/CD.
-
-==== Taches
-
-* [x] Creer un fichier `scripts/lib/versions.sh` centralisant TOUTES les versions des outils externes (eviter la duplication Dockerfile vs chroot).
-* [x] Refactoriser `060-install-chroot-software.chroot` pour sourcer `versions.sh` et supprimer tous les appels API `latest`.
-* [x] Extraire `scripts/lib/arch.sh` avec `get_arch_suffix()` et l'utiliser dans chroot + Dockerfile.
-* [x] Ajouter des traps `EXIT` dans `update-system.sh` (fonction `extract_iso_to_partition` et `copy_iso_grub`).
-* [x] Ajouter des traps `EXIT` dans `build-inner.sh` pour le nettoyage des montages loop ISO.
-* [x] Valider la reproductibilite : le script `test-software.sh` verifie dans la section "Reproducibility" que les versions installees dans le squashfs correspondent aux versions pinees dans `scripts/lib/versions.sh`. Deux builds consecutifs avec le meme `versions.sh` produisent EXACTEMENT le meme contenu binaire.
-
-'''
-
-* [x] **CACHE-BUILD** : Accélérer le build CI/CD via cache GitHub Actions pour les paquets live-build (`build/cache/packages.*`) et les outils externes installés via curl (Ollama, SDKMAN, NVM, etc.). Gain estimé : 10-30 min par build.
-
-'''
-
-=== EPIC 12 : Vinegar + Sober (Roblox Studio + Roblox Player)
-
-**Statut** : A FAIRE
-**Priorite** : BASSE
-**Contexte** : Installer Roblox Studio et Roblox Player dans le chroot via Vinegar (launcher Wine-based pour Roblox Studio) et Sober (runtime Android porté pour Roblox Player). Demande utilisateur session 060. Installation Flatpak sur l'hote de reference.
-
-==== Etat sur l'hote de reference
-
-* **Vinegar** : Flatpak `org.vinegarhq.Vinegar` v1.9.3 — launcher Roblox Studio sur Linux via Wine
-* **Sober** : Flatpak `org.vinegarhq.Sober` v1.6.7 — runtime Roblox Android porté sur Linux x86_64
-* Les deux viennent de Flathub, runtime GNOME Platform
-
-==== Installation chroot
-
-Deux options :
-
-. **Flatpak** (modele hote) : ajouter les flatpaks `org.vinegarhq.Vinegar` + `org.vinegarhq.Sober` dans le hook chroot existant qui configure Flatpak (EPIC 4)
-. **Binaire natif** : telecharger les releases GitHub si disponibles, pour eviter la dependance au runtime Flatpak dans le chroot
-
-==== Taches
-
-* [ ] Installer Vinegar (`org.vinegarhq.Vinegar`) dans le chroot — soit via Flatpak, soit binaire direct
-* [ ] Installer Sober (`org.vinegarhq.Sober`) dans le chroot — soit via Flatpak, soit binaire direct
-* [ ] Creer des `.desktop` files pour le menu XFCE (Roblox Studio + Roblox Player)
-* [ ] Tester le lancement depuis le live boot (verifier que le GPU est accessible)
-* [ ] Verifier l'integration dans test-software.sh (checks binaires squashfs)
-
-'''
-
-=== EPIC 13 : Plateformes de jeu (Heroic, Prism Launcher, RetroArch, Itch.io)
-
-**Statut** : A FAIRE
-**Priorite** : BASSE
-**Contexte** : Ajouter des plateformes de jeu gaming dans le chroot pour enrichir le Magic Stick en tant que clé bootable gaming zero-install. Toutes disponibles en Flatpak.
-
-==== Plateformes envisagees
-
-* **Heroic Games Launcher** : Epic Games + GOG, open source, jeux gratuits hebdomadaires Epic Games — Flatpak `com.heroicgameslauncher.hgl`
-* **Prism Launcher** : Launcher Minecraft Java open source, le plus reconnu — Flatpak `org.prismlauncher.PrismLauncher`
-* **RetroArch** : Emulateur tout-en-un (NES, SNES, GameBoy, PS1, etc.) — Flatpak `org.libretro.RetroArch`
-* **Itch.io** : Plateforme jeux independants — Flatpak `io.itch.itch`
-
-==== Taches
-
-* [ ] Installer Heroic Games Launcher dans le chroot — Flatpak `com.heroicgameslauncher.hgl`
-* [ ] Installer Prism Launcher dans le chroot — Flatpak `org.prismlauncher.PrismLauncher`
-* [ ] Installer RetroArch dans le chroot — Flatpak `org.libretro.RetroArch`
-* [ ] Installer Itch.io dans le chroot — Flatpak `io.itch.itch`
-* [ ] Creer des `.desktop` files pour le menu XFCE (Heroic, Prism, RetroArch, Itch)
-* [ ] Tester le lancement depuis le live boot (GPU, controleurs)
-* [ ] Verifier l'integration dans test-software.sh
-
-'''
-
-=== EPIC 14 : Migration CCCP — Bakery site statique
-
-**Statut** : A FAIRE
-**Priorite** : MOYENNE
-**Contexte** : Le site statique magic-stick (via bakery-gradle + JBake) utilise encore l'ancien compte cheroliv. À migrer après finalisation de bakery-gradle.
-
-==== Taches
-
-* [ ] Mettre a jour `site.yml` avec les credentials cccp-education
-* [ ] Mettre a jour le secret GitHub `BAKERY_GRADLE_PLUGIN` avec le nouveau `site.yml`
-* [ ] Mettre a jour le secret GitHub `GH_PAT` si necessaire
-* [ ] Verifier le deploiement gh-pages
+**Priorité** : MOYENNE
+* [ ] Mettre à jour site.yml credentials cccp-education
+* [ ] Vérifier déploiement gh-pages
