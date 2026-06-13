@@ -15,6 +15,8 @@ ISO_NAME="magic-stick_${MAGIC_STICK_VERSION}.iso"
 
 echo "=== Inner build (container) v${MAGIC_STICK_VERSION} ==="
 
+mkdir -p /tmp && chmod 1777 /tmp
+
 # ============================================================
 # External downloads cache
 # Cache bind-mounted into chroot at /tmp/dl-cache/ before lb build.
