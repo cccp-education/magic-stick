@@ -128,6 +128,9 @@ python3 "${CONFIG_DIR}/patches/patch-syslinux.py" || true
 echo "Patching lb_binary_iso for xorriso + UEFI support..."
 python3 "${CONFIG_DIR}/patches/patch-iso.py" || true
 
+echo "Patching lb_chroot_apt for chroot /tmp writable (GPG transient workaround)..."
+python3 "${CONFIG_DIR}/patches/patch-apt.py" || true
+
 DISK_SCRIPT="/usr/lib/live/build/lb_binary_disk"
 if [ -f "${DISK_SCRIPT}" ]; then
     sed -i 's#unmkinitramfs "../../${INITRD}" .#unmkinitramfs "../../${INITRD}" . || true#g' "${DISK_SCRIPT}"
@@ -139,16 +142,6 @@ if ls "${DL_CACHE}"/* >/dev/null 2>&1; then
     cp -a "${DL_CACHE}/"* "${BUILD_DIR}/chroot/tmp/dl-cache/" 2>/dev/null || true
     echo "==> $(find "${BUILD_DIR}/chroot/tmp/dl-cache" -type f | wc -l) files staged into chroot"
 fi
-
-echo "Ensuring /tmp is writable for apt-key (GPG transient workaround)..."
-if ! touch /tmp/.magic-stick-write-test 2>/dev/null; then
-    echo "WARN: /tmp not writable, mounting tmpfs..."
-    mount -t tmpfs tmpfs /tmp -o mode=1777,size=512M
-    echo "tmpfs mounted on /tmp"
-fi
-rm -f /tmp/.magic-stick-write-test
-chmod 1777 /tmp
-echo "/tmp writable: OK"
 
 echo "Building ISO... (this will take 30-60 minutes)"
 cd "${BUILD_DIR}" && lb build 2>&1
