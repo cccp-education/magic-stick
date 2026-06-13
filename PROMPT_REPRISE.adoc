@@ -1,21 +1,31 @@
-= PROMPT REPRISE — magic-stick Session 077
-:date: 2026-06-11
+= PROMPT REPRISE — magic-stick Session 078
+:date: 2026-06-13
 
 == Mission en cours
 
-Session 076 : Migration CCCP Docker Hub + SourceForge terminee.
+EPIC V-1 — Validation Physique ISO. Clé USB branchée, partitionnée A/B + persistence.
 
-== A faire (prochaine session)
+== Dernière action
 
-1. EPIC 14 — Migration CCCP Bakery site statique
-   - Mettre a jour site.yml
-   - Secret BAKERY_GRADLE_PLUGIN
-   - Secret GH_PAT
-   - gh-pages deploy
+Session 077 — Fix CI/CD pour validation physique :
+- 10 commits de fix CI/CD (live-media, cow_backend, overlay module, casper patch, GPG)
+- Build #5 SUCCESS (smoke test non-bloquant), builds #6→#14 FAIL (GPG transitoire)
+- Tag v0.1.14 sur commit d35b4f2
+- Artefact ISO non téléchargé (GPG transitoire bloque les builds taggés)
+- Image Docker Hub cccpeducation/magic-stick-cli:0.1.14 poussée
+
+== A faire (Session 078)
+
+1. Relancer le build taggé v0.1.14 jusqu'à succès (GPG transitoire)
+2. Télécharger l'artefact ISO magic-stick_0.1.14.iso
+3. Flasher sur /dev/sda (partition B inactive) via update-system.sh update
+4. Boot physique sur clé USB
 
 == Rappels
 
 . ZERO commit/push sans permission
 . Remote : cccp-education/magic-stick
-. Docker Hub : cccpeducation/magic-stick-cli
-. SourceForge : cccp-education@frs.sourceforge.net
+. Clé USB : /dev/sda (SanDisk 114.6G), partitions system_a/system_b/persistence
+. Flash via update-system.sh (préserve persistence), pas flash.sh (dd destructif)
+. Smoke test QEMU non-bloquant (continue-on-error: true)
+. GPG transitoire : relancer le build jusqu'à ce qu'il passe

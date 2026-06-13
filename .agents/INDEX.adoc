@@ -4,9 +4,9 @@ _Regles absolues_ : voir `AGENT.adoc`
 _Procedures_ : voir `LAZY_EAGER_ESSENTIALS.adoc`
 _Stockage backup_ : voir `.agents/GOVERNANCE_REFERENCE.adoc`
 
-_Derniere mise a jour_ : 2026-06-11 (session 076)
-_Session terminee_ : 076 — Migration CCCP : Docker Hub + SourceForge
-_Session en cours_ : 077 — EPIC 14 Migration CCCP Bakery site statique
+_Derniere mise a jour_ : 2026-06-13 (session 077)
+_Session terminee_ : 077 — Fix CI/CD pour Validation Physique ISO
+_Session en cours_ : 078 — EPIC V-1 Validation Physique ISO (flash + boot)
 
 '''
 
