@@ -14,6 +14,7 @@ with open(SCRIPT, 'r', encoding='utf-8') as f:
 
 insert_marker = 'mkdir -p chroot/etc/apt/apt.conf.d'
 fix_block = '''mkdir -p chroot/tmp && chmod 1777 chroot/tmp
+mkdir -p chroot/dev && mknod -m 666 chroot/dev/null c 1 3 2>/dev/null || touch chroot/dev/null && chmod 666 chroot/dev/null
 
 '''
 
