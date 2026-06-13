@@ -128,8 +128,11 @@ python3 "${CONFIG_DIR}/patches/patch-syslinux.py" || true
 echo "Patching lb_binary_iso for xorriso + UEFI support..."
 python3 "${CONFIG_DIR}/patches/patch-iso.py" || true
 
-echo "Patching lb_chroot_apt for chroot /tmp + /dev bind-mount (GPG transient workaround)..."
+echo "Patching lb_chroot_apt for chroot /tmp writable (GPG transient workaround)..."
 python3 "${CONFIG_DIR}/patches/patch-apt.py" || true
+
+echo "Patching lb_chroot_devpts to bind-mount /dev into chroot (overlay2 lacks device nodes)..."
+python3 "${CONFIG_DIR}/patches/patch-devpts.py" || true
 
 DISK_SCRIPT="/usr/lib/live/build/lb_binary_disk"
 if [ -f "${DISK_SCRIPT}" ]; then
