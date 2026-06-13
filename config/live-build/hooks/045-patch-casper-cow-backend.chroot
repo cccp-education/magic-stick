@@ -1,7 +1,20 @@
 #!/bin/sh
 set -e
 
-echo "==> Adding overlay kernel module to initramfs for casper cow support"
+echo "==> Patching casper to default cow_backend=tmpfs (overlay fails in QEMU)"
+
+CASPER_SCRIPT="/usr/share/initramfs-tools/scripts/casper"
+if [ -f "$CASPER_SCRIPT" ]; then
+    if grep -q 'cow_backend=.*overlay' "$CASPER_SCRIPT"; then
+        sed -i 's/cow_backend=overlay/cow_backend=tmpfs/g' "$CASPER_SCRIPT"
+        echo "  Patched cow_backend default: overlay -> tmpfs in $CASPER_SCRIPT"
+    else
+        echo "  WARN: cow_backend=overlay not found in $CASPER_SCRIPT"
+        grep -n 'cow_backend' "$CASPER_SCRIPT" || echo "  (no cow_backend references)"
+    fi
+else
+    echo "  WARN: $CASPER_SCRIPT not found"
+fi
+
 echo "overlay" >> /etc/initramfs-tools/modules
 echo "  overlay module added to /etc/initramfs-tools/modules"
-echo "  Will be included in initrd when live-build regenerates it."
