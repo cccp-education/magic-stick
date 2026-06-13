@@ -140,6 +140,16 @@ if ls "${DL_CACHE}"/* >/dev/null 2>&1; then
     echo "==> $(find "${BUILD_DIR}/chroot/tmp/dl-cache" -type f | wc -l) files staged into chroot"
 fi
 
+echo "Ensuring /tmp is writable for apt-key (GPG transient workaround)..."
+if ! touch /tmp/.magic-stick-write-test 2>/dev/null; then
+    echo "WARN: /tmp not writable, mounting tmpfs..."
+    mount -t tmpfs tmpfs /tmp -o mode=1777,size=512M
+    echo "tmpfs mounted on /tmp"
+fi
+rm -f /tmp/.magic-stick-write-test
+chmod 1777 /tmp
+echo "/tmp writable: OK"
+
 echo "Building ISO... (this will take 30-60 minutes)"
 cd "${BUILD_DIR}" && lb build 2>&1
 
