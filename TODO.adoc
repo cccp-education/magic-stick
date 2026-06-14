@@ -1,14 +1,12 @@
 = TODO — Magic Stick
-:last_update: 2026-06-13 — Nettoyé (items obsolètes archivés)
+:last_update: 2026-06-14 (Session 080)
 
 _Pense-bête informel. Pour les priorités, voir BACKLOG.adoc_
 
-* Tester le boot BIOS sur cle USB réelle
-* Tester le boot UEFI sur cle USB réelle
-* Tester les smoke tests QEMU en live boot USB
-* Tester l'image Docker CLI comme conteneur GitHub Actions
+* Tester le boot BIOS sur clé USB réelle (EPIC V-1)
+* Tester le boot UEFI sur clé USB réelle (EPIC V-1)
+* Tester les logiciels en live boot USB réel (EPIC 4)
 * EPIC 7 : Auto-update site de doc + IA release notes
 * EPIC 10 : Applications Docker (BigBlueButton, Rahoot, Formbricks, etc.)
 * EPIC 12 : Vinegar + Sober (Roblox)
 * EPIC 13 : Plateformes jeu (Heroic, Prism, RetroArch, Itch)
-* EPIC 14 : Migration CCCP site statique
