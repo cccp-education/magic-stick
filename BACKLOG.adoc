@@ -91,3 +91,43 @@
 
 **Priorité** : BASSE
 * [ ] Heroic Games Launcher, Prism Launcher, RetroArch, Itch.io
+
+== EPIC 15 : Network Boot & Remote Provisioning 🔲 A FAIRE
+
+**Priorité** : MOYENNE
+**Objectif** : Booter magic-stick en live sur des laptops Windows du réseau local
+sans reformater, sans toucher leurs partitions, sans clé USB complète.
+Pilotage à distance depuis la machine hôte magic-stick.
+
+=== US-1 : Proxy DHCP + TFTP/HTTP (dnsmasq)
+* [ ] Installer et configurer dnsmasq en proxy DHCP (ne casse pas le DHCP de la box)
+* [ ] `dhcp-range=proxy` + `dhcp-option=tag:pxeclient,option:bootfile-name`
+* [ ] Servir kernel + initrd via HTTP intégré à dnsmasq (plus rapide que TFTP)
+* [ ] Hook chroot pour inclure dnsmasq dans l'ISO
+
+=== US-2 : iPXE bootloader réseau
+* [ ] Compiler iPXE avec script embarqué (chaîne kernel+initrd HTTP + cmdline casper)
+* [ ] Servir iPXE via TFTP (dnsmasq `dhcp-boot=undionly.kpxe`)
+* [ ] Fallback : mini clé USB (50 Mo) avec juste iPXE → chaîne vers HTTP réseau
+* [ ] Script iPXE : `kernel http://<host>/casper/vmlinuz`, `initrd`, `boot`
+
+=== US-3 : Wake-on-LAN
+* [ ] Script `wake-laptops.sh` — envoie magic packet aux MACs des laptops cibles
+* [ ] Découverte MACs via scan ARP ou fichier config `laptops.conf`
+* [ ] Intégration dans la tâche Gradle `isoProvisionNetwork`
+
+=== US-4 : SSH dans l'ISO live
+* [ ] Hook chroot : installer openssh-server, générer clé hôte au boot
+* [ ] Mot de passe ou clé SSH pré-partagée pour l'utilisateur `magic`
+* [ ] Option kernel `ssh.enabled=1` dans le script iPXE
+* [ ] Test : SSH depuis l'hôte vers le laptop booté en live
+
+=== US-5 : Tâche Gradle `isoProvisionNetwork`
+* [ ] Tâche `isoProvisionNetwork` : wake-laptops → attendre boot → vérifier SSH → provisionner
+* [ ] Paramètres : `-Plaptops=mac1,mac2,mac3` ou fichier config
+* [ ] Mode dry-run : affiche ce qui serait fait sans exécuter
+
+=== US-6 : Test bout en bout
+* [ ] Test QEMU : simuler 2 clients PXE + 1 serveur dnsmasq
+* [ ] Test réel : 2 laptops Windows, boot réseau, SSH fonctionnel
+* [ ] Documentation : `NETWORK_BOOT.adoc` dans `docs/`

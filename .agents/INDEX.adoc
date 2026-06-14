@@ -46,6 +46,8 @@ _Session en cours_ : 081 — Boot physique + EPIC 7
 | EPIC 11 : Pinning + reproductibilite | 100% TERMINE | HAUTE
 | EPIC 12 : Vinegar + Sober (Roblox) | 0% | BASSE
 | EPIC 13 : Plateformes jeu (Flatpak) | 0% | BASSE
+| EPIC 14 : Migration CCCP | 100% TERMINE | MOYENNE
+| EPIC 15 : Network Boot & Remote Provisioning | 0% (6 US cadrées) | MOYENNE
 | EPIC V-1 : Validation Physique ISO | 98% (boot hardware restant uniquement, UEFI+Legacy prêt) | CRITIQUE
 |===
 

@@ -10,3 +10,4 @@ _Pense-bête informel. Pour les priorités, voir BACKLOG.adoc_
 * EPIC 10 : Applications Docker (BigBlueButton, Rahoot, Formbricks, etc.)
 * EPIC 12 : Vinegar + Sober (Roblox)
 * EPIC 13 : Plateformes jeu (Heroic, Prism, RetroArch, Itch)
+* EPIC 15 : Network Boot & Remote Provisioning (PXE/iPXE, dnsmasq, WoL, SSH)
