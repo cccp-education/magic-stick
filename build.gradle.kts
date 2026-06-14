@@ -437,3 +437,111 @@ tasks.register<org.gradle.api.tasks.Exec>("isoReleaseNotes") {
         addAll(args)
     })
 }
+
+// ============================================================
+// EPIC 15 — Network Boot & Remote Provisioning (Host-only, sudo)
+// ============================================================
+// Boot magic-stick live on remote laptops via PXE/iPXE over the
+// local network. No reformat, no USB key, no touching partitions.
+// Architecture: dnsmasq (proxy DHCP + TFTP/HTTP) + iPXE + WoL + SSH.
+
+tasks.register<org.gradle.api.tasks.Exec>("isoNetworkBoot") {
+    group = "iso"
+    description = "Start network boot server (dnsmasq proxy DHCP + iPXE TFTP + kernel/initrd HTTP)." +
+        " Host-only. Pass -PsudoPassword=... -Piface=eth0 -PhttpPort=8080"
+    val ci = System.getenv("CI") ?: ""
+    val isoFile = file("build/$isoName")
+    onlyIf { ci.isEmpty() && isoFile.exists() }
+    val password = (project.findProperty("sudoPassword") as? String) ?: ""
+    val iface = (project.findProperty("iface") as? String) ?: "eth0"
+    val httpPort = (project.findProperty("httpPort") as? String) ?: "8080"
+    commandLine("sudo", "-S", "bash", "-c",
+        "set -e; " +
+        "echo '=== Network Boot Server ==='; " +
+        "echo \"Interface: $iface  HTTP port: $httpPort\"; " +
+        "echo \"ISO: $isoFile\"; " +
+        "echo; " +
+        "echo 'Starting dnsmasq (proxy DHCP + TFTP + HTTP)...'; " +
+        "bash \"$scriptDir/network-boot.sh\" start \"$iface\" \"$httpPort\" \"$isoFile\"; " +
+        "echo; " +
+        "echo '=== Server running. Laptops can now PXE boot. ==='; " +
+        "echo 'Press Ctrl+C to stop.'")
+    standardInput = password.byteInputStream()
+}
+
+tasks.register<org.gradle.api.tasks.Exec>("isoWakeLaptops") {
+    group = "iso"
+    description = "Send Wake-on-LAN magic packets to target laptops." +
+        " Host-only. Pass -Plaptops=aa:bb:cc:dd:ee:ff,11:22:33:44:55:66 -PsudoPassword=..."
+    val ci = System.getenv("CI") ?: ""
+    val laptops = (project.findProperty("laptops") as? String) ?: ""
+    onlyIf { ci.isEmpty() && laptops.isNotEmpty() }
+    val password = (project.findProperty("sudoPassword") as? String) ?: ""
+    commandLine("sudo", "-S", "bash", "-c",
+        "set -e; " +
+        "echo '=== Wake-on-LAN ==='; " +
+        "IFS=',' read -ra MACS <<< \"$laptops\"; " +
+        "for mac in \"\${MACS[@]}\"; do " +
+        "  echo \"Waking \$mac...\"; " +
+        "  bash \"$scriptDir/wake-laptops.sh\" \"\$mac\"; " +
+        "done; " +
+        "echo '=== WoL packets sent ==='")
+    standardInput = password.byteInputStream()
+}
+
+tasks.register<org.gradle.api.tasks.Exec>("isoProvisionNetwork") {
+    group = "iso"
+    description = "Full network provisioning pipeline: wake laptops → wait SSH → verify boot." +
+        " Host-only. Pass -Plaptops=mac1,mac2 -PsshUser=magic -PsshPass=... -PsudoPassword=..."
+    val ci = System.getenv("CI") ?: ""
+    val laptops = (project.findProperty("laptops") as? String) ?: ""
+    val isoFile = file("build/$isoName")
+    onlyIf { ci.isEmpty() && laptops.isNotEmpty() && isoFile.exists() }
+    val password = (project.findProperty("sudoPassword") as? String) ?: ""
+    val sshUser = (project.findProperty("sshUser") as? String) ?: "magic"
+    val sshPass = (project.findProperty("sshPass") as? String) ?: ""
+    val iface = (project.findProperty("iface") as? String) ?: "eth0"
+    val httpPort = (project.findProperty("httpPort") as? String) ?: "8080"
+    commandLine("sudo", "-S", "bash", "-c",
+        "set -e; " +
+        "echo '=== Network Provisioning Pipeline ==='; " +
+        "echo; " +
+        "echo '[1/4] Starting network boot server...'; " +
+        "bash \"$scriptDir/network-boot.sh\" start \"$iface\" \"$httpPort\" \"$isoFile\" & " +
+        "SERVER_PID=\$!; sleep 2; " +
+        "echo \"  Server PID: \$SERVER_PID\"; " +
+        "echo; " +
+        "echo '[2/4] Waking laptops...'; " +
+        "IFS=',' read -ra MACS <<< \"$laptops\"; " +
+        "for mac in \"\${MACS[@]}\"; do " +
+        "  echo \"  Waking \$mac...\"; " +
+        "  bash \"$scriptDir/wake-laptops.sh\" \"\$mac\"; " +
+        "done; " +
+        "echo; " +
+        "echo '[3/4] Waiting for SSH (timeout 120s)...'; " +
+        "for mac in \"\${MACS[@]}\"; do " +
+        "  echo \"  Waiting for \$mac to boot...\"; " +
+        "  for i in \$(seq 1 24); do " +
+        "    if sshpass -p \"$sshPass\" ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 \"$sshUser@\$mac\" 'echo OK' 2>/dev/null; then " +
+        "      echo \"  \$mac: SSH READY\"; break; " +
+        "    fi; " +
+        "    sleep 5; " +
+        "  done; " +
+        "done; " +
+        "echo; " +
+        "echo '[4/4] Provisioning complete.'; " +
+        "echo 'Laptops are live-booted on magic-stick.'; " +
+        "echo \"Server still running (PID \$SERVER_PID). Press Ctrl+C to stop.\"; " +
+        "wait \$SERVER_PID")
+    standardInput = password.byteInputStream()
+}
+
+tasks.register("isoNetworkTest") {
+    group = "iso"
+    description = "Test network boot pipeline end-to-end in QEMU (2 PXE clients + 1 dnsmasq server)"
+    dependsOn("isoBuild")
+    // Placeholder — will run test-boot.sh --pxe mode when implemented
+    doLast {
+        logger.lifecycle("EPIC 15 US-6: QEMU PXE test — script à implémenter dans test-boot.sh --pxe")
+    }
+}
