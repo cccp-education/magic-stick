@@ -4,9 +4,9 @@ _Regles absolues_ : voir `AGENT.adoc`
 _Procedures_ : voir `LAZY_EAGER_ESSENTIALS.adoc`
 _Stockage backup_ : voir `.agents/GOVERNANCE_REFERENCE.adoc`
 
-_Derniere mise a jour_ : 2026-06-13 (session 077)
-_Session terminee_ : 077 — Fix CI/CD pour Validation Physique ISO
-_Session en cours_ : 078 — EPIC V-1 Validation Physique ISO (flash + boot)
+_Derniere mise a jour_ : 2026-06-14 (session 078)
+_Session terminee_ : 078 — EPIC V-1 Validation Physique ISO TERMINÉ (build + flash + deploy)
+_Session en cours_ : 079 — Aucune mission définie
 
 '''
 
@@ -51,7 +51,7 @@ _Session en cours_ : 078 — EPIC V-1 Validation Physique ISO (flash + boot)
 | EPIC 11 : Pinning + reproductibilite | 100% TERMINE | HAUTE
 | EPIC 12 : Vinegar + Sober (Roblox) | 0% | BASSE
 | EPIC 13 : Plateformes jeu (Flatpak) | 0% | BASSE
-| EPIC V-1 : Validation Physique ISO | 80% (CI/CD run #26331414227 en cours, boot -cdrom full, manque tag+deploy+flash physique) | CRITIQUE
+| EPIC V-1 : Validation Physique ISO | 100% TERMINE (build #38 SUCCESS, ISO + SourceForge + Docker Hub, flash System B, GRUB default=1) | CRITIQUE
 |===
 
 '''

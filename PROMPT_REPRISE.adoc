@@ -1,31 +1,33 @@
-= PROMPT REPRISE — magic-stick Session 078
-:date: 2026-06-13
+= PROMPT REPRISE — magic-stick Session 079
+:date: 2026-06-14
 
 == Mission en cours
 
-EPIC V-1 — Validation Physique ISO. Clé USB branchée, partitionnée A/B + persistence.
+*Aucune.* EPIC V-1 terminée (build ISO + flash + déploiement).
 
 == Dernière action
 
-Session 077 — Fix CI/CD pour validation physique :
-- 10 commits de fix CI/CD (live-media, cow_backend, overlay module, casper patch, GPG)
-- Build #5 SUCCESS (smoke test non-bloquant), builds #6→#14 FAIL (GPG transitoire)
-- Tag v0.1.14 sur commit d35b4f2
-- Artefact ISO non téléchargé (GPG transitoire bloque les builds taggés)
-- Image Docker Hub cccpeducation/magic-stick-cli:0.1.14 poussée
+Session 078 — EPIC V-1 Validation Physique ISO TERMINÉE :
+- Fix GPG transitoire : patch `lb_chroot_devpts` bind-mount `/dev/{null,zero,urandom,random}`
+- Build #34 SUCCESS, Build #38 SUCCESS complet (ISO + SourceForge + Docker Hub)
+- ISO v0.1.14 téléchargée (5.4GB), sha256 vérifié
+- Flash sur `/dev/sda2` (System B) via `update-system.sh update`
+- GRUB `set default=1` → boot System B
+- QEMU smoke test local : échoue (overlay cow_backend, connu, non-bloquant)
+- CI smoke test : SUCCESS
 
-== A faire (Session 078)
+== A faire (Session 079)
 
-1. Relancer le build taggé v0.1.14 jusqu'à succès (GPG transitoire)
-2. Télécharger l'artefact ISO magic-stick_0.1.14.iso
-3. Flasher sur /dev/sda (partition B inactive) via update-system.sh update
-4. Boot physique sur clé USB
+Backlog restant :
+. Boot physique sur clé USB (manuel, hardware réel) — CRITIQUE
+. EPIC 7 — Site doc auto + IA release notes — 1%, BASSE
+. Nettoyer `patch-bootstrap.py` (vestige, non utilisé)
+. Aucune mission définie pour la session 079.
 
 == Rappels
 
 . ZERO commit/push sans permission
 . Remote : cccp-education/magic-stick
-. Clé USB : /dev/sda (SanDisk 114.6G), partitions system_a/system_b/persistence
-. Flash via update-system.sh (préserve persistence), pas flash.sh (dd destructif)
-. Smoke test QEMU non-bloquant (continue-on-error: true)
-. GPG transitoire : relancer le build jusqu'à ce qu'il passe
+. Clé USB : /dev/sda, System A=v0.1.13, System B=v0.1.14, GRUB default=1
+. SourceForge : projet magic-stick créé, déploiement CI OK
+. Docker Hub : cccpeducation/magic-stick-cli:0.1.14

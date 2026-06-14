@@ -1,0 +1,48 @@
+= Rapport Session 078 — EPIC V-1 Validation Physique ISO
+:date: 2026-06-14
+:score: 8/10
+
+== Objectif
+
+Terminer l'EPIC V-1 : construire l'ISO v0.1.14, flasher sur clé USB, boot physique.
+
+== Problème
+
+GPG transitoire : `apt-key` ne peut pas créer `/tmp/apt.conf.*` dans le chroot
+debootstrap sur Docker overlay2. 6 mitigations de la session 077 avaient échoué.
+
+== Solution (7 commits itératifs)
+
+. `a540b8d` — tmpfs /tmp hôte → échec (le problème est dans le chroot, pas l'hôte)
+. `fd47fb6` — patch `lb_chroot_apt` pour `chroot/tmp` writable → échec (`/dev/null` manquant)
+. `6788ad6` — mknod `chroot/dev/null` → échec (overlay2 ne supporte pas les device nodes)
+. `7e24d9b` — bind-mount `/dev` complet → échec (submounts `/dev/shm`, `/dev/mqueue` bloquent cleanup)
+. `9401096` — bind-mount `/dev/pts` → échec (`chroot: failed to run command '/usr/bin/env'`)
+. `454f671` — patch `lb_bootstrap_debootstrap` mknod → échec (debootstrap écrase le chroot)
+. `9392e35` — bind-mount `/dev` dans `lb_chroot_apt` + unmount → échec (live-build unmount avant)
+. `6c269b5` — patch `lb_chroot_devpts` bind-mount `/dev` complet → échec (submounts cleanup)
+. *`55cb5c4`* — **SUCCESS** : bind-mount individuel `/dev/{null,zero,urandom,random}` dans `lb_chroot_devpts`, unmount propre
+
+== Résultats
+
+* Build #34 SUCCESS (premier build passant après fix GPG)
+* Build #38 SUCCESS complet : ISO + SourceForge + Docker Hub
+* ISO v0.1.14 téléchargée (5.4GB), sha256 vérifié
+* Flash sur `/dev/sda2` (System B) via `update-system.sh update`
+* GRUB config : `set default=1` → boot System B
+* QEMU smoke test local : échoue (overlay cow_backend, connu, non-bloquant)
+* CI smoke test : SUCCESS (build #38)
+
+== Fichiers modifiés
+
+* `scripts/build-inner.sh` — ajout appel `patch-devpts.py`
+* `config/live-build/patches/patch-apt.py` — `chroot/tmp` writable
+* `config/live-build/patches/patch-devpts.py` — **NOUVEAU** — bind-mount `/dev` nodes
+* `config/live-build/patches/patch-bootstrap.py` — **NOUVEAU** — tentative mknod (vestige)
+* `.github/workflows/build.yml` — `mkdir -p` avant rsync SourceForge
+
+== Reste à faire
+
+* Boot physique sur clé USB (manuel, hardware réel)
+* Créer le projet SourceForge manuellement (fait par l'utilisateur)
+* Nettoyer `patch-bootstrap.py` (vestige, non utilisé)
