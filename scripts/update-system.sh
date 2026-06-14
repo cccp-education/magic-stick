@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="0.2.0"
+VERSION="0.3.0"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 BUILD_DIR="${PROJECT_DIR}/build"
 
+BIOSGRUB_LABEL="bios_grub"
+ESP_LABEL="ESP"
 SYSTEM_A_LABEL="system_a"
 SYSTEM_B_LABEL="system_b"
 PERSISTENCE_LABEL="persistence"
 
-GRUB_CFG_TEMPLATE="${SCRIPT_DIR}/grub-ab.cfg.template"
 FORCE_YES=false
 DRY_RUN=false
 
@@ -46,19 +47,21 @@ Commands:
   status <device>            Show current A/B partition status
   verify <device>            Verify partition layout and GRUB installation
 
-Partition layout (GPT):
-  /dev/sdX1  system_a      (8 GB)  - System partition A
-  /dev/sdX2  system_b      (8 GB)  - System partition B
-  /dev/sdX3  persistence  (rest)   - User data (never touched by updates)
+GPT partition layout (v${VERSION}):
+  /dev/sdX1  bios_grub     (1 MB)  - Legacy BIOS GRUB stage1.5
+  /dev/sdX2  ESP           (512 MB) - UEFI System Partition (FAT32)
+  /dev/sdX3  system_a      (8 GB)   - System partition A
+  /dev/sdX4  system_b      (8 GB)   - System partition B
+  /dev/sdX5  persistence  (rest)    - User data (never touched by updates)
 
 Each system partition contains:
-  /vmlinuz              - Linux kernel
-  /initrd.img           - Initial ramdisk
-  /filesystem.squashfs  - Compressed root filesystem
+  /casper/vmlinuz         - Linux kernel
+  /casper/initrd.img      - Initial ramdisk
+  /casper/filesystem.squashfs - Compressed root filesystem
 
-GRUB is installed on the device MBR with a config that boots
-from the active partition (A or B). Switching is done by
-changing the default entry in grub.cfg.
+GRUB is installed for BOTH Legacy BIOS (i386-pc on MBR + bios_grub)
+and UEFI (x86_64-efi on ESP). Switching is done by changing the
+default entry in grub.cfg on system_a.
 
 WARNING: These commands modify partition tables and write to raw devices!
 USE WITH CAUTION - always verify the target device.
@@ -103,9 +106,11 @@ get_device_size_bytes() {
 
 label_to_partnum() {
     case "$1" in
-        "${SYSTEM_A_LABEL}") echo 1 ;;
-        "${SYSTEM_B_LABEL}") echo 2 ;;
-        "${PERSISTENCE_LABEL}") echo 3 ;;
+        "${BIOSGRUB_LABEL}") echo 1 ;;
+        "${ESP_LABEL}") echo 2 ;;
+        "${SYSTEM_A_LABEL}") echo 3 ;;
+        "${SYSTEM_B_LABEL}") echo 4 ;;
+        "${PERSISTENCE_LABEL}") echo 5 ;;
         *) echo 0 ;;
     esac
 }
@@ -134,21 +139,15 @@ detect_active_partition() {
     local prefix
     prefix=$(get_part_prefix "$device")
 
-    local part_a="${prefix}1"
-    local part_b="${prefix}2"
+    local part_a="${prefix}3"
+    local part_b="${prefix}4"
 
     if mount | grep -q "$part_a"; then
         echo "A"
     elif mount | grep -q "$part_b"; then
         echo "B"
     else
-        local boot_flag
-        boot_flag=$(parted -s "$device" print 2>/dev/null | grep boot | head -1 | awk '{print $1}' || echo "1")
-        if [[ "$boot_flag" == "1" ]]; then
-            echo "A"
-        else
-            echo "B"
-        fi
+        echo "A"
     fi
 }
 
@@ -156,7 +155,7 @@ read_grub_default() {
     local device="$1"
     local prefix
     prefix=$(get_part_prefix "$device")
-    local part_a="${prefix}1"
+    local part_a="${prefix}3"
 
     local mount_point
     mount_point=$(mktemp -d)
@@ -197,11 +196,7 @@ cmd_status() {
     echo ""
 
     echo "Partition details:"
-    local part_a="${prefix}1"
-    local part_b="${prefix}2"
-    local part_p="${prefix}3"
-
-    for i in 1 2 3; do
+    for i in 1 2 3 4 5; do
         local part="${prefix}${i}"
         if [[ -b "$part" ]]; then
             local label
@@ -234,7 +229,7 @@ cmd_status() {
             mount_point=$(mktemp -d)
             if mount -o ro "$part" "$mount_point" 2>/dev/null; then
                 trap 'umount "$part" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
-                for f in vmlinuz initrd.img filesystem.squashfs; do
+                for f in casper/vmlinuz casper/initrd.img casper/filesystem.squashfs; do
                     if [[ -f "${mount_point}/${f}" ]]; then
                         local fsize
                         fsize=$(du -h "${mount_point}/${f}" 2>/dev/null | cut -f1 || echo "?")
@@ -243,6 +238,11 @@ cmd_status() {
                         echo "    ${f}: MISSING"
                     fi
                 done
+                if [[ -f "${mount_point}/boot/grub/grub.cfg" ]]; then
+                    local def
+                    def=$(grep 'set default=' "${mount_point}/boot/grub/grub.cfg" | head -1 | tr -d '"')
+                    echo "    GRUB: ${def}"
+                fi
             else
                 echo "    (cannot mount)"
                 rmdir "$mount_point" 2>/dev/null || true
@@ -258,12 +258,12 @@ cmd_setup_ab() {
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY-RUN] Would setup A/B partitions on ${device}"
         echo "[DRY-RUN]   - Create GPT partition table"
-        echo "[DRY-RUN]   - Partition 1: ${SYSTEM_A_LABEL} (8 GB)"
-        echo "[DRY-RUN]   - Partition 2: ${SYSTEM_B_LABEL} (8 GB)"
-        echo "[DRY-RUN]   - Partition 3: ${PERSISTENCE_LABEL} (rest)"
-        echo "[DRY-RUN]   - Format all partitions as ext4"
-        echo "[DRY-RUN]   - Create persistence.conf"
-        echo "[DRY-RUN]   - Install GRUB to ${device} MBR"
+        echo "[DRY-RUN]   - Partition 1: ${BIOSGRUB_LABEL} (1 MB, bios_grub flag)"
+        echo "[DRY-RUN]   - Partition 2: ${ESP_LABEL} (512 MB, FAT32, esp flag)"
+        echo "[DRY-RUN]   - Partition 3: ${SYSTEM_A_LABEL} (8 GB, ext4)"
+        echo "[DRY-RUN]   - Partition 4: ${SYSTEM_B_LABEL} (8 GB, ext4)"
+        echo "[DRY-RUN]   - Partition 5: ${PERSISTENCE_LABEL} (rest, ext4)"
+        echo "[DRY-RUN]   - Install GRUB Legacy (i386-pc) + UEFI (x86_64-efi)"
         [[ -n "$iso_file" ]] && echo "[DRY-RUN]   - Install ISO ${iso_file} to System A"
         return 0
     fi
@@ -273,19 +273,19 @@ cmd_setup_ab() {
 
     local device_size
     device_size=$(get_device_size_bytes "$device")
-    local min_size=$((24 * 1024 * 1024 * 1024))
+    local min_size=$((25 * 1024 * 1024 * 1024))
 
-    [[ "$device_size" -ge "$min_size" ]] || die "Device ${device} is too small ($(numfmt --to=iec "$device_size")). Minimum required: 24 GB (2x8GB system + 8GB persistence)"
+    [[ "$device_size" -ge "$min_size" ]] || die "Device ${device} is too small ($(numfmt --to=iec "$device_size")). Minimum required: 25 GB (ESP 512MB + 2x8GB system + persistence)"
 
-    echo "=== Magic Stick A/B Setup ==="
+    echo "=== Magic Stick A/B Setup v${VERSION} ==="
     echo "Device: ${device} ($(numfmt --to=iec "$device_size"))"
     echo ""
-    echo "This will create the following GPT partition layout:"
-    echo "  Partition 1: ${SYSTEM_A_LABEL}    (8 GB)  - System A (GRUB default)"
-    echo "  Partition 2: ${SYSTEM_B_LABEL}    (8 GB)  - System B"
-    echo "  Partition 3: ${PERSISTENCE_LABEL} (rest)   - User data"
-    echo ""
-    echo "And install GRUB in the device MBR for dual-boot."
+    echo "New GPT partition layout (Legacy BIOS + UEFI dual boot):"
+    echo "  Partition 1: ${BIOSGRUB_LABEL}    (1 MB)    - Legacy GRUB stage1.5"
+    echo "  Partition 2: ${ESP_LABEL}         (512 MB)  - UEFI System Partition"
+    echo "  Partition 3: ${SYSTEM_A_LABEL}    (8 GB)    - System A"
+    echo "  Partition 4: ${SYSTEM_B_LABEL}    (8 GB)    - System B"
+    echo "  Partition 5: ${PERSISTENCE_LABEL} (rest)    - User data"
     echo ""
     echo "WARNING: This will ERASE ALL DATA on ${device}!"
     echo ""
@@ -301,40 +301,60 @@ cmd_setup_ab() {
     done
     umount "${device}"* 2>/dev/null || true
 
+    # ── GPT partition layout ───────────────────────────────
+    # 1: bios_grub   (1 MiB,  no FS, flag bios_grub)
+    # 2: ESP         (512 MiB, FAT32, flag esp)
+    # 3: system_a    (8 GiB,  ext4)
+    # 4: system_b    (8 GiB,  ext4)
+    # 5: persistence (rest,   ext4)
+    #
+    # parted uses MiB=1048576 bytes, GiB=1073741824 bytes.
+    # Sizes: 1 MiB = end of p1, +512 MiB = end of p2 (513 MiB),
+    #        +8 GiB = end of p3 (~8513 MiB),
+    #        +8 GiB = end of p4 (~16513 MiB),
+    #        rest up to 100%.
+
     info "Creating GPT partition table..."
     parted -s "$device" mklabel gpt
 
-    info "Creating partition 1: ${SYSTEM_A_LABEL} (8 GB)..."
-    parted -s "$device" mkpart "${SYSTEM_A_LABEL}" ext4 1MiB 8GiB
-    parted -s "$device" set 1 boot on
+    info "Creating partition 1: ${BIOSGRUB_LABEL} (1 MiB)..."
+    parted -s "$device" mkpart "${BIOSGRUB_LABEL}" 1MiB 2MiB
+    parted -s "$device" set 1 bios_grub on
 
-    info "Creating partition 2: ${SYSTEM_B_LABEL} (8 GB)..."
-    parted -s "$device" mkpart "${SYSTEM_B_LABEL}" ext4 8GiB 16GiB
+    info "Creating partition 2: ${ESP_LABEL} (512 MiB, FAT32)..."
+    parted -s "$device" mkpart "${ESP_LABEL}" fat32 2MiB 514MiB
+    parted -s "$device" set 2 esp on
 
-    info "Creating partition 3: ${PERSISTENCE_LABEL} (rest)..."
-    parted -s "$device" mkpart "${PERSISTENCE_LABEL}" ext4 16GiB 100%
+    info "Creating partition 3: ${SYSTEM_A_LABEL} (8 GiB)..."
+    parted -s "$device" mkpart "${SYSTEM_A_LABEL}" ext4 514MiB 8706MiB
+
+    info "Creating partition 4: ${SYSTEM_B_LABEL} (8 GiB)..."
+    parted -s "$device" mkpart "${SYSTEM_B_LABEL}" ext4 8706MiB 16898MiB
+
+    info "Creating partition 5: ${PERSISTENCE_LABEL} (rest)..."
+    parted -s "$device" mkpart "${PERSISTENCE_LABEL}" ext4 16898MiB 100%
 
     info "Informing kernel of partition changes..."
     partprobe "$device" 2>/dev/null || true
     sleep 2
 
     info "Formatting partitions..."
-    mkfs.ext4 -L "${SYSTEM_A_LABEL}" "${prefix}1"
-    mkfs.ext4 -L "${SYSTEM_B_LABEL}" "${prefix}2"
-    mkfs.ext4 -L "${PERSISTENCE_LABEL}" "${prefix}3"
+    mkfs.fat -F32 -n "${ESP_LABEL}" "${prefix}2"
+    mkfs.ext4 -L "${SYSTEM_A_LABEL}" "${prefix}3"
+    mkfs.ext4 -L "${SYSTEM_B_LABEL}" "${prefix}4"
+    mkfs.ext4 -L "${PERSISTENCE_LABEL}" "${prefix}5"
 
-    local part_p="${prefix}3"
+    info "Creating persistence configuration..."
+    local part_p="${prefix}5"
     local mount_point
     mount_point=$(mktemp -d)
     mount "${part_p}" "$mount_point"
     trap 'umount "${part_p}" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
-
-    info "Creating persistence configuration..."
     cat > "${mount_point}/persistence.conf" << 'EOF'
 / union
 EOF
 
-    info "Installing GRUB to device MBR..."
+    info "Installing GRUB (Legacy BIOS + UEFI) to ${device}..."
     install_grub "$device"
 
     echo ""
@@ -355,7 +375,7 @@ EOF
         echo "  2. Optional: install to System B:"
         echo "     sudo $0 install ${device} /path/to/magic-stick.iso B"
         echo ""
-        echo "  3. Boot from USB and select System A or B in GRUB menu"
+        echo "  3. Boot from USB — works in BOTH Legacy BIOS and UEFI mode"
     fi
 }
 
@@ -364,36 +384,51 @@ install_grub() {
 
     local prefix
     prefix=$(get_part_prefix "$device")
-    local part_a="${prefix}1"
+    local part_esp="${prefix}2"
+    local part_a="${prefix}3"
 
-    local mount_point
-    mount_point=$(mktemp -d)
+    local mount_esp=""
+    local mount_a=""
 
-    mount "${part_a}" "$mount_point" || die "Cannot mount ${part_a} for GRUB installation"
-    trap 'sync; umount "${part_a}" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN
+    cleanup_grub_install() {
+        if [[ -n "$mount_a" ]]; then
+            sync
+            umount "$mount_a" 2>/dev/null || true
+            rmdir "$mount_a" 2>/dev/null || true
+        fi
+        if [[ -n "$mount_esp" ]]; then
+            sync
+            umount "$mount_esp" 2>/dev/null || true
+            rmdir "$mount_esp" 2>/dev/null || true
+        fi
+    }
 
-    mkdir -p "${mount_point}/boot/grub"
+    mount_a=$(mktemp -d)
+    mount "${part_a}" "$mount_a" || die "Cannot mount ${part_a} for GRUB installation"
+    mount_esp=$(mktemp -d)
+    mount "${part_esp}" "$mount_esp" || die "Cannot mount ${part_esp} (ESP) for GRUB installation"
+    trap cleanup_grub_install RETURN EXIT
 
-    generate_grub_cfg "${mount_point}/boot/grub/grub.cfg" "A"
+    mkdir -p "${mount_a}/boot/grub"
+    mkdir -p "${mount_esp}/EFI/BOOT"
 
-    info "Installing GRUB BIOS (i386-pc) to ${device}..."
+    generate_grub_cfg "${mount_a}/boot/grub/grub.cfg" "A"
+
+    info "Installing GRUB Legacy (i386-pc) to ${device} MBR + bios_grub..."
     grub-install --target=i386-pc \
-        --boot-directory="${mount_point}/boot" \
+        --boot-directory="${mount_a}/boot" \
         --force \
-        "$device"
+        "$device" || warn "GRUB Legacy installation failed (non-fatal if UEFI works)"
 
-    if [[ -d /sys/firmware/efi ]] || [[ -d /boot/efi ]]; then
-        info "UEFI firmware detected. Installing GRUB EFI..."
-        local efi_dir="${mount_point}/boot/efi"
-        mkdir -p "${efi_dir}"
-        grub-install --target=x86_64-efi \
-            --efi-directory="${efi_dir}" \
-            --boot-directory="${mount_point}/boot" \
-            --removable \
-            --no-nvram \
-            "$device" 2>/dev/null || warn "GRUB EFI installation failed (non-fatal for BIOS boot)"
-    fi
+    info "Installing GRUB UEFI (x86_64-efi) to ESP..."
+    grub-install --target=x86_64-efi \
+        --efi-directory="${mount_esp}" \
+        --boot-directory="${mount_a}/boot" \
+        --removable \
+        --no-nvram \
+        "$device" || warn "GRUB UEFI installation failed"
 
+    info "GRUB installed: Legacy BIOS (i386-pc) + UEFI (x86_64-efi)"
     sync
 }
 
@@ -569,9 +604,9 @@ cmd_install() {
 
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY-RUN] Would install ISO ${iso_file} to System ${target} on ${device}"
-        echo "[DRY-RUN]   - Target partition: ${prefix}$([[ "$target" =~ ^[Aa]$ ]] && echo "1" || echo "2")"
+        echo "[DRY-RUN]   - Target partition: ${prefix}$([[ "$target" =~ ^[Aa]$ ]] && echo "3" || echo "4")"
         echo "[DRY-RUN]   - Extract vmlinuz, initrd.img, filesystem.squashfs"
-        echo "[DRY-RUN]   - Re-install GRUB"
+        echo "[DRY-RUN]   - Re-install GRUB (Legacy + UEFI)"
         return 0
     fi
 
@@ -580,11 +615,11 @@ cmd_install() {
     case "$target" in
         A|a)
             target_label="${SYSTEM_A_LABEL}"
-            target_part="${prefix}1"
+            target_part="${prefix}3"
             ;;
         B|b)
             target_label="${SYSTEM_B_LABEL}"
-            target_part="${prefix}2"
+            target_part="${prefix}4"
             ;;
         *)
             die "Invalid target: ${target}. Use A or B."
@@ -614,7 +649,7 @@ cmd_install() {
 
     extract_iso_to_partition "$iso_file" "$target_part" "$target_label"
 
-    info "Re-installing GRUB..."
+    info "Re-installing GRUB (Legacy BIOS + UEFI)..."
     install_grub "$device"
 
     echo ""
@@ -651,15 +686,15 @@ cmd_update() {
     local prefix
     prefix=$(get_part_prefix "$device")
 
-    local part_a="${prefix}1"
-    local part_b="${prefix}2"
+    local part_a="${prefix}3"
+    local part_b="${prefix}4"
 
     echo "=== Magic Stick A/B Update ==="
     echo "ISO:    ${iso_file}"
     echo "Device: ${device}"
     echo ""
 
-    for i in 1 2 3; do
+    for i in 1 2 3 4 5; do
         [[ -b "${prefix}${i}" ]] || die "Partition ${prefix}${i} not found. Run 'setup-ab' first."
     done
 
@@ -713,7 +748,7 @@ switch_grub_default() {
 
     local prefix
     prefix=$(get_part_prefix "$device")
-    local part_a="${prefix}1"
+    local part_a="${prefix}3"
 
     local mount_point
     mount_point=$(mktemp -d)
@@ -732,7 +767,7 @@ cmd_switch() {
 
     local prefix
     prefix=$(get_part_prefix "$device")
-    local part_a="${prefix}1"
+    local part_a="${prefix}3"
 
     local current_default
     current_default=$(read_grub_default "$device")
@@ -770,7 +805,7 @@ cmd_verify() {
 
     local errors=0
 
-    echo "[1/5] Checking partition table..."
+    echo "[1/7] Checking partition table..."
     local pt_type
     pt_type=$(parted -s "$device" print 2>/dev/null | grep "Partition Table:" | awk '{print $3}' || echo "")
     if [[ "$pt_type" == "gpt" ]]; then
@@ -780,26 +815,58 @@ cmd_verify() {
         ((errors++))
     fi
 
-    echo "[2/5] Checking partition labels..."
-    local part_a="${prefix}1"
-    local part_b="${prefix}2"
-    local part_p="${prefix}3"
+    echo "[2/7] Checking boot partitions..."
+    local part_esp="${prefix}2"
+    local part_biosgrub="${prefix}1"
 
-    for part_num in 1 2 3; do
+    local esp_type
+    esp_type=$(blkid -s TYPE -o value "$part_esp" 2>/dev/null || echo "")
+    if [[ "$esp_type" == "vfat" ]]; then
+        echo "  OK: ESP partition ${part_esp} is FAT32"
+    else
+        echo "  FAIL: ESP partition ${part_esp} type='${esp_type}' (expected vfat)"
+        ((errors++))
+    fi
+
+    if [[ -b "$part_biosgrub" ]]; then
+        echo "  OK: bios_grub partition ${part_biosgrub} exists"
+    else
+        echo "  FAIL: bios_grub partition ${part_biosgrub} not found"
+        ((errors++))
+    fi
+
+    echo "[3/7] Checking UEFI bootloader on ESP..."
+    if [[ -f "${mount_point:-/nonexistent}/EFI/BOOT/BOOTX64.EFI" ]]; then
+        echo "  OK: BOOTX64.EFI found on ESP"
+    else
+        local esp_mount
+        esp_mount=$(mktemp -d)
+        if mount -o ro "$part_esp" "$esp_mount" 2>/dev/null; then
+            if [[ -f "${esp_mount}/EFI/BOOT/BOOTX64.EFI" ]]; then
+                echo "  OK: BOOTX64.EFI found on ESP"
+            else
+                echo "  WARN: BOOTX64.EFI not found on ESP (run install after flash)"
+            fi
+            umount "$esp_mount" 2>/dev/null || true
+        else
+            echo "  WARN: Cannot mount ESP"
+        fi
+        rmdir "$esp_mount" 2>/dev/null || true
+    fi
+
+    echo "[4/7] Checking partition labels..."
+    local expected_labels=(1:"${BIOSGRUB_LABEL}" 2:"${ESP_LABEL}" 3:"${SYSTEM_A_LABEL}" 4:"${SYSTEM_B_LABEL}" 5:"${PERSISTENCE_LABEL}")
+
+    for entry in "${expected_labels[@]}"; do
+        local part_num="${entry%%:*}"
+        local expected_label="${entry#*:}"
         local part="${prefix}${part_num}"
-        local expected_label
-        case "$part_num" in
-            1) expected_label="${SYSTEM_A_LABEL}" ;;
-            2) expected_label="${SYSTEM_B_LABEL}" ;;
-            3) expected_label="${PERSISTENCE_LABEL}" ;;
-        esac
 
         if [[ ! -b "$part" ]]; then
             echo "  FAIL: Partition ${part} not found"
             ((errors++))
             continue
         fi
-
         local label
         label=$(blkid -s LABEL -o value "$part" 2>/dev/null || echo "")
         if [[ "$label" == "$expected_label" ]]; then
@@ -810,8 +877,8 @@ cmd_verify() {
         fi
     done
 
-    echo "[3/5] Checking system partition contents..."
-    for part_num in 1 2; do
+    echo "[5/7] Checking system partition contents..."
+    for part_num in 3 4; do
         local part="${prefix}${part_num}"
         local part_label
         part_label=$(blkid -s LABEL -o value "$part" 2>/dev/null || echo "?")
@@ -819,7 +886,7 @@ cmd_verify() {
         mount_point=$(mktemp -d)
         if mount -o ro "$part" "$mount_point" 2>/dev/null; then
             trap 'umount "$part" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
-            for f in vmlinuz initrd.img filesystem.squashfs; do
+            for f in casper/vmlinuz casper/initrd.img casper/filesystem.squashfs; do
                 if [[ -f "${mount_point}/${f}" ]]; then
                     echo "  OK: ${part_label}/${f}"
                 else
@@ -832,13 +899,13 @@ cmd_verify() {
         fi
     done
 
-    echo "[4/5] Checking persistence..."
-    local part_p_dev="${prefix}3"
-    if [[ -b "$part_p_dev" ]]; then
+    echo "[6/7] Checking persistence..."
+    local part_p="${prefix}5"
+    if [[ -b "$part_p" ]]; then
         local mount_point
         mount_point=$(mktemp -d)
-        if mount -o ro "$part_p_dev" "$mount_point" 2>/dev/null; then
-            trap 'umount "$part_p_dev" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
+        if mount -o ro "$part_p" "$mount_point" 2>/dev/null; then
+            trap 'umount "$part_p" 2>/dev/null || true; rmdir "$mount_point" 2>/dev/null || true' RETURN EXIT
             if [[ -f "${mount_point}/persistence.conf" ]]; then
                 echo "  OK: persistence.conf found"
             else
@@ -853,8 +920,8 @@ cmd_verify() {
         ((errors++))
     fi
 
-    echo "[5/5] Checking GRUB..."
-    if [[ -f "/boot/grub/i386-pc/boot.img" ]] || command -v grub-install >/dev/null 2>&1; then
+    echo "[7/7] Checking GRUB toolchain..."
+    if command -v grub-install >/dev/null 2>&1; then
         echo "  OK: grub-install available"
     else
         echo "  WARN: grub-install not found"

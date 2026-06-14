@@ -1,33 +1,29 @@
-= PROMPT REPRISE — magic-stick Session 079
+= PROMPT REPRISE — magic-stick Session 080
 :date: 2026-06-14
 
 == Mission en cours
 
-*Aucune.* EPIC V-1 terminée (build ISO + flash + déploiement).
+*Aucune.* EPIC V-1 prêt pour boot physique. Clé USB repartitionnée
+avec support UEFI+Legacy, ISO v0.1.14 flashé sur System A.
 
 == Dernière action
 
-Session 078 — EPIC V-1 Validation Physique ISO TERMINÉE :
-- Fix GPG transitoire : patch `lb_chroot_devpts` bind-mount `/dev/{null,zero,urandom,random}`
-- Build #34 SUCCESS, Build #38 SUCCESS complet (ISO + SourceForge + Docker Hub)
-- ISO v0.1.14 téléchargée (5.4GB), sha256 vérifié
-- Flash sur `/dev/sda2` (System B) via `update-system.sh update`
-- GRUB `set default=1` → boot System B
-- QEMU smoke test local : échoue (overlay cow_backend, connu, non-bloquant)
-- CI smoke test : SUCCESS
+Session 079 — EPIC V-1 UEFI ESP + Bootstrap Gradle Tasks :
+- `update-system.sh` v0.3.0 : layout 5 partitions (bios_grub + ESP + system_a + system_b + persistence)
+- Double boot GRUB installé : Legacy (i386-pc) + UEFI (x86_64-efi avec BOOTX64.EFI)
+- 5 nouvelles tâches Gradle : `isoCheckUSB`, `isoUpdateSystem`, `isoValidateUSB`, `isoTestPersistence`, `isoReleaseNotes` — tout couvert, zéro script orphelin
+- `test-persistence-mock.sh` + `test-ab-partition.sh` adaptés v0.3.0
+- Clé USB réinitialisée : `/dev/sda`, 5 partitions, v0.1.14 sur System A, GRUB default=0
 
-== A faire (Session 079)
+== A faire (Session 080)
 
-Backlog restant :
-. Boot physique sur clé USB (manuel, hardware réel) — CRITIQUE
+. Boot physique sur clé USB — Legacy BIOS et/ou UEFI, checklist EPIC_V1_VALIDATION_CHECKLIST.adoc
 . EPIC 7 — Site doc auto + IA release notes — 1%, BASSE
-. Nettoyer `patch-bootstrap.py` (vestige, non utilisé)
-. Aucune mission définie pour la session 079.
 
 == Rappels
 
 . ZERO commit/push sans permission
 . Remote : cccp-education/magic-stick
-. Clé USB : /dev/sda, System A=v0.1.13, System B=v0.1.14, GRUB default=1
-. SourceForge : projet magic-stick créé, déploiement CI OK
+. Clé USB : /dev/sda, 5 partitions, System A=v0.1.14, System B=vide, GRUB default=0
+. SourceForge : magic-stick_0.1.14.iso
 . Docker Hub : cccpeducation/magic-stick-cli:0.1.14

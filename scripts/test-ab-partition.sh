@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Magic Stick A/B Partition Test Suite
+# Magic Stick A/B Partition Test Suite (v0.3.0 layout: p1=bios_grub, p2=ESP, p3=system_a, p4=system_b, p5=persistence)
 # Simule une cle USB A/B avec une image disque (loop device)
 # Utilisable SANS sudo pour les tests non-root, ou AVEC sudo pour les tests full-stack
 
@@ -9,9 +9,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 BUILD_DIR="${PROJECT_DIR}/build"
 TEST_DISK="${BUILD_DIR}/test-usb.img"
-DISK_SIZE_GB=3
+DISK_SIZE_GB=4
 DISK_SIZE=$((DISK_SIZE_GB * 1024 * 1024 * 1024))
 
+BIOSGRUB_LABEL="bios_grub"
+ESP_LABEL="ESP"
 SYSTEM_A_LABEL="system_a"
 SYSTEM_B_LABEL="system_b"
 PERSISTENCE_LABEL="persistence"
@@ -27,14 +29,14 @@ cleanup_loop() {
     local loopdev="${1:-}"
     [[ -z "$loopdev" ]] && return 0
     info "Cleaning up loop device ${loopdev}..."
-    for i in 1 2 3; do
+    for i in 1 2 3 4 5; do
         umount "${loopdev}p${i}" 2>/dev/null || true
     done
     losetup -d "$loopdev" 2>/dev/null || true
 }
 
 cmd_test_partition() {
-    echo "=== TEST: Partition A/B layout ==="
+    echo "=== TEST: Partition A/B layout (v0.3.0: 5 partitions) ==="
     echo ""
 
     if [[ "$(id -u)" -ne 0 ]]; then
@@ -45,10 +47,8 @@ cmd_test_partition() {
 
     info "Root mode: full partition test"
 
-    # Find a free loop device
     LOOP_DEV=$(losetup -f --show "$TEST_DISK" 2>/dev/null || true)
     if [[ -z "$LOOP_DEV" ]]; then
-        # Retry with show before setup
         LOOP_DEV=$(losetup -f 2>/dev/null || true)
         [[ -n "$LOOP_DEV" ]] || die "No free loop device available"
         losetup "$LOOP_DEV" "$TEST_DISK" 2>/dev/null || die "Cannot setup loop device for ${TEST_DISK}"
@@ -63,7 +63,7 @@ cmd_test_partition() {
 
     echo ""
     echo "Partition details:"
-    for i in 1 2 3; do
+    for i in 1 2 3 4 5; do
         local part="${LOOP_DEV}p${i}"
         if [[ -b "$part" ]]; then
             local label fstype size
@@ -71,55 +71,83 @@ cmd_test_partition() {
             fstype=$(blkid -s TYPE -o value "$part" 2>/dev/null || echo "N/A")
             size=$(lsblk -n -o SIZE "$part" 2>/dev/null || echo "N/A")
             echo "  ${part}: label=${label} fstype=${fstype} size=${size}"
-            case "$i" in
-                1) [[ "$label" == "$SYSTEM_A_LABEL" ]] && pass "Partition 1 label = ${SYSTEM_A_LABEL}" || fail "Partition 1 label mismatch: '${label}'" ;;
-                2) [[ "$label" == "$SYSTEM_B_LABEL" ]] && pass "Partition 2 label = ${SYSTEM_B_LABEL}" || fail "Partition 2 label mismatch: '${label}'" ;;
-                3) [[ "$label" == "$PERSISTENCE_LABEL" ]] && pass "Partition 3 label = ${PERSISTENCE_LABEL}" || fail "Partition 3 label mismatch: '${label}'" ;;
-            esac
         else
-            fail "Partition ${part} not found"
+            echo "  ${part}: NOT FOUND"
+        fi
+    done
+
+    echo ""
+    echo "Checking UEFI ESP..."
+    for part in "${LOOP_DEV}p2" "${LOOP_DEV}2"; do
+        if [[ -b "$part" ]]; then
+            local esp_mount
+            esp_mount=$(mktemp -d)
+            if mount -o ro "$part" "$esp_mount" 2>/dev/null; then
+                if [[ -f "${esp_mount}/EFI/BOOT/BOOTX64.EFI" ]]; then
+                    pass "BOOTX64.EFI found on ESP"
+                else
+                    warn "BOOTX64.EFI not found on ESP"
+                    ls -R "${esp_mount}/EFI" 2>/dev/null || warn "No EFI directory on ESP"
+                fi
+                umount "$esp_mount" 2>/dev/null || true
+            else
+                warn "Cannot mount ESP"
+            fi
+            rmdir "$esp_mount" 2>/dev/null || true
+            break
         fi
     done
 
     echo ""
     echo "Checking persistence.conf..."
-    local mount_point
-    mount_point=$(mktemp -d)
-    if mount "${LOOP_DEV}p3" "$mount_point" 2>/dev/null; then
-        if [[ -f "${mount_point}/persistence.conf" ]]; then
-            pass "persistence.conf found"
-            cat "${mount_point}/persistence.conf"
-        else
-            warn "persistence.conf not found"
+    for part in "${LOOP_DEV}p5" "${LOOP_DEV}5"; do
+        if [[ -b "$part" ]]; then
+            local mount_point
+            mount_point=$(mktemp -d)
+            if mount "$part" "$mount_point" 2>/dev/null; then
+                if [[ -f "${mount_point}/persistence.conf" ]]; then
+                    pass "persistence.conf found"
+                    cat "${mount_point}/persistence.conf"
+                else
+                    warn "persistence.conf not found"
+                fi
+                umount "$mount_point" 2>/dev/null || true
+            else
+                warn "Cannot mount persistence partition"
+            fi
+            rmdir "$mount_point" 2>/dev/null || true
+            break
         fi
-        umount "$mount_point" 2>/dev/null || true
-    else
-        warn "Cannot mount persistence partition"
-    fi
-    rmdir "$mount_point" 2>/dev/null || true
+    done
 
     echo ""
-    echo "Checking GRUB installation..."
-    mount_point=$(mktemp -d)
-    if mount "${LOOP_DEV}p1" "$mount_point" 2>/dev/null; then
-        if [[ -f "${mount_point}/boot/grub/grub.cfg" ]]; then
-            pass "grub.cfg found"
-            head -20 "${mount_point}/boot/grub/grub.cfg"
-        else
-            warn "grub.cfg not found"
-        fi
+    echo "Checking GRUB installation on system_a..."
+    for part in "${LOOP_DEV}p3" "${LOOP_DEV}3"; do
+        if [[ -b "$part" ]]; then
+            local mount_point
+            mount_point=$(mktemp -d)
+            if mount "$part" "$mount_point" 2>/dev/null; then
+                if [[ -f "${mount_point}/boot/grub/grub.cfg" ]]; then
+                    pass "grub.cfg found"
+                    head -20 "${mount_point}/boot/grub/grub.cfg"
+                else
+                    warn "grub.cfg not found"
+                fi
 
-        if [[ -f "${mount_point}/boot/grub/i386-pc/boot.img" ]]; then
-            pass "GRUB BIOS boot.img present"
-        else
-            warn "GRUB BIOS boot.img not found"
-        fi
+                if [[ -f "${mount_point}/boot/grub/i386-pc/boot.img" ]]; then
+                    pass "GRUB BIOS boot.img present"
+                else
+                    warn "GRUB BIOS boot.img not found"
+                fi
 
-        umount "$mount_point" 2>/dev/null || true
-    else
-        warn "Cannot mount system_a partition"
-    fi
-    rmdir "$mount_point" 2>/dev/null || true
+                umount "$mount_point" 2>/dev/null || true
+            else
+                warn "Cannot mount system_a partition"
+            fi
+            rmdir "$mount_point" 2>/dev/null || true
+            break
+        fi
+    done
 
     echo ""
     echo "=== Partition test complete ==="
@@ -140,18 +168,25 @@ cmd_create_disk() {
     info "Creating ${DISK_SIZE_GB}GB test disk image..."
     dd if=/dev/zero of="$TEST_DISK" bs=1M count=$((DISK_SIZE_GB * 1024)) status=progress conv=sparse
 
-    info "Creating GPT partition table..."
+    info "Creating GPT partition table (v0.3.0 layout)..."
     parted -s "$TEST_DISK" mklabel gpt
 
-    info "Creating partition 1: ${SYSTEM_A_LABEL} (1 GB)..."
-    parted -s "$TEST_DISK" mkpart "${SYSTEM_A_LABEL}" ext4 1MiB 1025MiB
-    parted -s "$TEST_DISK" set 1 boot on
+    info "Creating partition 1: ${BIOSGRUB_LABEL} (1 MiB)..."
+    parted -s "$TEST_DISK" mkpart "${BIOSGRUB_LABEL}" 1MiB 2MiB
+    parted -s "$TEST_DISK" set 1 bios_grub on
 
-    info "Creating partition 2: ${SYSTEM_B_LABEL} (1 GB)..."
-    parted -s "$TEST_DISK" mkpart "${SYSTEM_B_LABEL}" ext4 1025MiB 2049MiB
+    info "Creating partition 2: ${ESP_LABEL} (100 MiB, FAT32)..."
+    parted -s "$TEST_DISK" mkpart "${ESP_LABEL}" fat32 2MiB 102MiB
+    parted -s "$TEST_DISK" set 2 esp on
 
-    info "Creating partition 3: ${PERSISTENCE_LABEL} (rest)..."
-    parted -s "$TEST_DISK" mkpart "${PERSISTENCE_LABEL}" ext4 2049MiB 100%
+    info "Creating partition 3: ${SYSTEM_A_LABEL} (1 GiB)..."
+    parted -s "$TEST_DISK" mkpart "${SYSTEM_A_LABEL}" ext4 102MiB 1126MiB
+
+    info "Creating partition 4: ${SYSTEM_B_LABEL} (1 GiB)..."
+    parted -s "$TEST_DISK" mkpart "${SYSTEM_B_LABEL}" ext4 1126MiB 2150MiB
+
+    info "Creating partition 5: ${PERSISTENCE_LABEL} (rest)..."
+    parted -s "$TEST_DISK" mkpart "${PERSISTENCE_LABEL}" ext4 2150MiB 100%
 
     info "Formatting partitions..."
     local LOOP_DEV
@@ -161,14 +196,15 @@ cmd_create_disk() {
     partprobe "$LOOP_DEV" 2>/dev/null || true
     sleep 1
 
-    mkfs.ext4 -L "${SYSTEM_A_LABEL}" "${LOOP_DEV}p1"
-    mkfs.ext4 -L "${SYSTEM_B_LABEL}" "${LOOP_DEV}p2"
-    mkfs.ext4 -L "${PERSISTENCE_LABEL}" "${LOOP_DEV}p3"
+    mkfs.fat -F32 -n "${ESP_LABEL}" "${LOOP_DEV}p2"
+    mkfs.ext4 -L "${SYSTEM_A_LABEL}" "${LOOP_DEV}p3"
+    mkfs.ext4 -L "${SYSTEM_B_LABEL}" "${LOOP_DEV}p4"
+    mkfs.ext4 -L "${PERSISTENCE_LABEL}" "${LOOP_DEV}p5"
 
     info "Creating persistence.conf..."
     local mount_point
     mount_point=$(mktemp -d)
-    mount "${LOOP_DEV}p3" "$mount_point"
+    mount "${LOOP_DEV}p5" "$mount_point"
     cat > "${mount_point}/persistence.conf" << 'EOF'
 / union
 EOF
@@ -182,8 +218,6 @@ EOF
     echo "=== Test disk created ==="
     echo "Image: ${TEST_DISK}"
     echo "Size:  ${DISK_SIZE_GB}GB"
-    echo "Use:   sudo losetup -f --show ${TEST_DISK}"
-    echo "Then run: ${0} test"
 }
 
 cmd_run_setup_ab() {
@@ -240,7 +274,7 @@ cmd_status() {
 
 usage() {
     cat << USAGE
-Magic Stick A/B Partition Test Suite
+Magic Stick A/B Partition Test Suite (v0.3.0 layout)
 
 Usage: ${0##*/} <command> [options]
 

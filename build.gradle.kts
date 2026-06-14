@@ -40,6 +40,7 @@ tasks.register("a11yAudit") {
 val magicStickVersion = rootProject.file("VERSION").readText().trim()
 val dockerImage = "magic-stick:builder"
 val projDir = layout.projectDirectory.asFile.absolutePath
+val scriptDir = "${projDir}/scripts"
 val isoDir = "${projDir}/build"
 val isoName = "magic-stick_${magicStickVersion}.iso"
 
@@ -208,8 +209,8 @@ tasks.register<org.gradle.api.tasks.Exec>("isoTestVNC") {
 
 tasks.register("isoTestFull") {
     group = "iso"
-    description = "Full test suite: verify + boot + A/B partition + software + smoke"
-    dependsOn("isoVerify", "isoTestSoftware", "isoTestSmoke")
+    description = "Full test suite: verify + boot + A/B partition + persistence + software + smoke"
+    dependsOn("isoVerify", "isoTestPersistence", "isoTestSoftware", "isoTestSmoke")
     finalizedBy("isoTestBoot")
 }
 
@@ -305,4 +306,102 @@ tasks.register("dockerHubJwt") {
         dockerhubCredsFile.writeText(lines.joinToString("\n") + "\n")
         logger.lifecycle("JWT stored in ${dockerhubCredsFile.absolutePath}")
     }
+}
+
+// ============================================================
+// EPIC V-1 — Validation Physique USB (Host-only, sudo)
+// ============================================================
+// These tasks run on the HOST (not Docker) because they need
+// direct block device access (/dev/sdX, mount, GRUB install).
+// Skipped in CI (no physical USB key available).
+
+tasks.register<org.gradle.api.tasks.Exec>("isoCheckUSB") {
+    group = "iso"
+    description = "Validate USB key (partitions, GRUB, system contents, ISO checksum)." +
+        " Host-only. Pass -Pdevice=/dev/sdX -PsudoPassword=..."
+    val device = (project.findProperty("device") as? String) ?: ""
+    val ci = System.getenv("CI") ?: ""
+    onlyIf { device.isNotEmpty() && ci.isEmpty() && file("build/$isoName").exists() }
+    val password = (project.findProperty("sudoPassword") as? String) ?: ""
+    val scriptDir = "$projDir/scripts"
+    commandLine("sudo", "-S", "bash", "-c",
+        "set -e; " +
+        "echo '=== ISO Checksum ==='; " +
+        "sha256sum \"$projDir/build/$isoName\"; " +
+        "echo; " +
+        "echo '=== USB Key Verification ==='; " +
+        "bash \"$scriptDir/update-system.sh\" verify \"$device\" || echo 'Verification completed with warnings'; " +
+        "echo; " +
+        "echo '=== USB Key Status ==='; " +
+        "bash \"$scriptDir/update-system.sh\" status \"$device\" || echo 'Status completed with warnings'; " +
+        "echo; " +
+        "echo '=== CHECK DONE. Reboot PC on USB key to complete EPIC V-1 physical validation. ==='")
+    standardInput = password.byteInputStream()
+}
+
+tasks.register<org.gradle.api.tasks.Exec>("isoUpdateSystem") {
+    group = "iso"
+    description = "Flash ISO to USB inactive A/B partition (active→inactive + GRUB switch)." +
+        " Host-only. Pass -Pdevice=/dev/sdX -PsudoPassword=..."
+    val device = (project.findProperty("device") as? String) ?: ""
+    val ci = System.getenv("CI") ?: ""
+    val isoFile = file("build/$isoName")
+    onlyIf { device.isNotEmpty() && ci.isEmpty() && isoFile.exists() }
+    val password = (project.findProperty("sudoPassword") as? String) ?: ""
+    val scriptDir = "$projDir/scripts"
+    commandLine("sudo", "-S", "bash", "-c",
+        "set -e; " +
+        "echo '=== Pre-flash Status ==='; " +
+        "bash \"$scriptDir/update-system.sh\" status \"$device\" || true; " +
+        "echo; " +
+        "echo '=== Flashing ISO to inactive partition ==='; " +
+        "bash \"$scriptDir/update-system.sh\" --yes update \"$device\" \"$isoFile\"; " +
+        "echo; " +
+        "echo '=== Post-flash Verification ==='; " +
+        "bash \"$scriptDir/update-system.sh\" verify \"$device\" || echo 'Verification completed with warnings'; " +
+        "echo; " +
+        "echo '=== Post-flash Status ==='; " +
+        "bash \"$scriptDir/update-system.sh\" status \"$device\" || true; " +
+        "echo; " +
+        "echo '=== FLASH COMPLETE. Default boot switched. Reboot to test on real hardware. ==='")
+    standardInput = password.byteInputStream()
+}
+
+tasks.register("isoValidateUSB") {
+    group = "iso"
+    description = "Full USB validation pipeline: pre-check + flash + post-verify." +
+        " Pass -Pdevice=/dev/sdX -PsudoPassword=..."
+    dependsOn("isoCheckUSB")
+    finalizedBy("isoUpdateSystem")
+}
+
+tasks.register<org.gradle.api.tasks.Exec>("isoTestPersistence") {
+    group = "iso"
+    description = "Validate update-system.sh never touches persistence partition (static analysis, no loop device)"
+    dependsOn("dockerBuild")
+    commandLine("docker", "run", "--rm",
+        "-v", "$projDir:/magic-stick",
+        dockerImage,
+        "bash", "/magic-stick/scripts/test-persistence-mock.sh",
+        "/magic-stick/scripts/update-system.sh")
+}
+
+tasks.register<org.gradle.api.tasks.Exec>("isoReleaseNotes") {
+    group = "iso"
+    description = "Generate AsciiDoc release notes from conventional commits." +
+        " Override range with -PfromTag=v0.1.13 -PtoTag=v0.1.14 -Poutput=releases.adoc"
+    val fromTag = (project.findProperty("fromTag") as? String) ?: ""
+    val toTag = (project.findProperty("toTag") as? String) ?: ""
+    val output = (project.findProperty("output") as? String) ?: ""
+    val args = buildList {
+        if (fromTag.isNotEmpty()) { add("--from-tag"); add(fromTag) }
+        if (toTag.isNotEmpty()) { add("--to-tag"); add(toTag) }
+        if (output.isNotEmpty()) { add("--output"); add(output) }
+    }
+    onlyIf { file("$projDir/.git").exists() }
+    commandLine(buildList {
+        add("bash")
+        add("$scriptDir/generate-release-notes.sh")
+        addAll(args)
+    })
 }

@@ -4,9 +4,9 @@ _Regles absolues_ : voir `AGENT.adoc`
 _Procedures_ : voir `LAZY_EAGER_ESSENTIALS.adoc`
 _Stockage backup_ : voir `.agents/GOVERNANCE_REFERENCE.adoc`
 
-_Derniere mise a jour_ : 2026-06-14 (session 078)
-_Session terminee_ : 078 — EPIC V-1 Validation Physique ISO TERMINÉ (build + flash + deploy)
-_Session en cours_ : 079 — Aucune mission définie
+_Derniere mise a jour_ : 2026-06-14 (session 079)
+_Session terminee_ : 079 — EPIC V-1 UEFI ESP + Bootstrap Gradle Tasks
+_Session en cours_ : 080 — Aucune mission définie
 
 '''
 
@@ -14,22 +14,16 @@ _Session en cours_ : 079 — Aucune mission définie
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
-| 074 | 2026-05-23 | fix+ci | Full ISO boot via -cdrom (abandon -kernel/-initrd), +console=ttyS0,115200 build | `074-full-iso-boot.adoc` | 6/10
-| 073 | 2026-05-23 | fix+ci | Fix Initrd Patching — boucle decompresseurs sans `file -b`, validation cpio magic | `073-fix-initrd-patching-ci-cd.adoc` | 7/10
-| 072 | 2026-05-23 | fix+ci | Fix Smoke Test QEMU — ISO patching xorriso + -cdrom normal boot | `072-fix-smoke-test-qemu.adoc` | 8/10
-| 071 | 2026-05-23 | fix+ci | Fix CI/CD ISO Build — 7 fixes (Gradle problems-report, python3.12, ripgrep, set +e) | `071-fix-ci-cd-iso-build.adoc` | 8/10
-| 063 | 2026-05-01 | feat + docs | EPIC 8 Docker Hub : docker-compose.yml + doc README | `063-epic8-dockerhub-doc.adoc` | 7/10
-| 069 | 2026-05-07 | chore | Migration chemins foundry/ → foundry/OSS/ (granularisation OSS/CSS) | — | —
-| 062 | 2026-05-01 | feat + ci/cd | EPIC 4 smoke CI/CD + EPIC 9 editeurs TERMINE | `062-epic4-smoke-epic9-editors.adoc` | 8/10
-| 061 | 2026-05-01 | backlog | EPIC 13 plateformes jeu + EPIC 12 precision Roblox | `061-epic13-plateformes-jeu.adoc` | 7/10
-| 060 | 2026-05-01 | backlog | EPIC 12 Vinegar + Sober (Roblox) + audit contexte | `060-epic12-vinegar-sober-roblox.adoc` | 7/10
-| 059 | 2026-05-01 | test + feat | EPIC 4 validation live boot + smoke tests QEMU | `059-epic4-validation-live-boot.adoc` | 8/10
-| 058 | 2026-05-01 | backlog | EPIC 5 finalise BACKLOG + planification EPIC 4 | `058-epic5-finalisation-backlog.adoc` | 8/10
-| 057 | 2026-05-01 | feat + ci/cd | EPIC 11 TERMINE cache CI/CD + reproducibility | `057-epic11-cache-reproducibility.adoc` | 8/10
-| 056 | 2026-05-01 | fix + ci/cd | EPIC 11 fix lazygit Linux_x86_64 casse | `056-fix-jt-linux-casse.adoc` | 8/10
-| 055 | 2026-04-30 | governance | Gouvernance agent audit 50 pts + 5 projets | `055-gouvernance-audit-complet-5-projets.adoc` | 9/10
-| 054 | 2026-04-30 | fix | Fix checksums lazygit/just chroot | (archive 055) | 8/10
-| 053 | 2026-04-30 | fix + security | EPIC 11 P0.4-P0.7 fixes cumules | `053-epic11-p0.4-p0.7-fixes.adoc` | 8/10
+| 079 | 14 juin 2026 | feat+governance | EPIC V-1 UEFI ESP + Bootstrap Gradle Tasks — update-system.sh v0.3.0 (ESP+bios_grub dual boot), 5 Gradle tasks, scripts adaptés, clé repartitionnée. Boot possible en UEFI et Legacy. | `079-epic-v1-uefi-esp-gradle-tasks.adoc` | 8/10
+| 078 | 14 juin 2026 | fix+ci+deploy | EPIC V-1 Validation Physique ISO TERMINÉ — Fix GPG transitoire, Build #38 SUCCESS, flash System B | `078-epic-v1-validation-physique.adoc` | 8/10
+| 077 | 13 juin 2026 | fix+ci | Fix CI/CD pour Validation Physique ISO — 10 commits, Build #5 SUCCESS | `077-fix-ci-cd-validation-physique.adoc` | 5/10
+| 076 | 11 juin 2026 | migration | Migration CCCP : Docker Hub + SourceForge | `076-migration-cccp.adoc` | 7/10
+| 075 | 28 mai 2026 | fix+ci | Retour -kernel/-initrd/-append avec live-media=/dev/sr0 | `075-fix-smoke-test-kernel-boot.adoc` | 6/10
+| 074 | 23 mai 2026 | fix+ci | Full ISO boot via -cdrom | `074-full-iso-boot.adoc` | 6/10
+| 073 | 23 mai 2026 | fix+ci | Fix Initrd Patching CI/CD | `073-fix-initrd-patching-ci-cd.adoc` | 7/10
+| 072 | 23 mai 2026 | fix+ci | Fix Smoke Test QEMU | `072-fix-smoke-test-qemu.adoc` | 8/10
+| 071 | 23 mai 2026 | fix+ci | Fix CI/CD ISO Build | `071-fix-ci-cd-iso-build.adoc` | 8/10
+| 070 | 22 mai 2026 | fix+ci/cd+backlog | EPIC V-1 : fixes CI/CD + checklist physique + flash merger | `070-epic-v1-validation-physique.adoc` | 8/10
 |===
 
 '''
@@ -43,7 +37,7 @@ _Session en cours_ : 079 — Aucune mission définie
 | EPIC 3 : Partition A/B + Persistence | 100% TERMINE | HAUTE
 | EPIC 4 : Logiciels chroot | 98% (manque test physique) | MOYENNE
 | EPIC 5 : Personnalisation XFCE | 100% TERMINE | MOYENNE
-| EPIC 6 : Script update-system A/B | 100% TERMINE | HAUTE
+| EPIC 6 : Script update-system A/B | 100% TERMINE (v0.3.0 dual boot UEFI+Legacy) | HAUTE
 | EPIC 7 : Site doc auto + IA release notes | 1% | BASSE
 | EPIC 8 : Dockerisation CLI (Docker Hub) | 100% TERMINE | MOYENNE
 | EPIC 9 : Editeurs /opt/ | 100% TERMINE | MOYENNE
@@ -51,7 +45,7 @@ _Session en cours_ : 079 — Aucune mission définie
 | EPIC 11 : Pinning + reproductibilite | 100% TERMINE | HAUTE
 | EPIC 12 : Vinegar + Sober (Roblox) | 0% | BASSE
 | EPIC 13 : Plateformes jeu (Flatpak) | 0% | BASSE
-| EPIC V-1 : Validation Physique ISO | 100% TERMINE (build #38 SUCCESS, ISO + SourceForge + Docker Hub, flash System B, GRUB default=1) | CRITIQUE
+| EPIC V-1 : Validation Physique ISO | 98% (boot hardware restant uniquement, UEFI+Legacy prêt) | CRITIQUE
 |===
 
 '''
@@ -62,13 +56,7 @@ Projets gerant la meme methodologie opencode :
 
 |===
 | Projet | Repertoire | Version | Derniere maj
-| magic-stick | `~/workspace/foundry/OSS/magic-stick` | 064 | 2026-05-01
-| bakery-gradle | `~/workspace/foundry/OSS/bakery-gradle/bakery-plugin` | 5 | 2026-04-23
-| cheroliv.com | `~/workspace/foundry/OSS/cheroliv.com` | 4 | 2026-04-25
-| plantuml-gradle | `~/workspace/foundry/OSS/plantuml-gradle/plantuml-plugin` | 132 | 2026-04-23
-| jhipster-gradle-plugins | `~/workspace/foundry/OSS/jhipster-gradle-plugins` | Audit 053 | 2026-04-30
-| quizz-benchmark-gradle | `~/workspace/foundry/OSS/quizz-benchmark-gradle/quizz-benchmark-plugin` | Audit 053 | 2026-04-30
+| magic-stick | `~/workspace/foundry/public/magic-stick` | 079 | 2026-06-14
+| bakery-gradle | `~/workspace/foundry/public/bakery-gradle/bakery-plugin` | — | —
+| plantuml-gradle | `~/workspace/foundry/public/plantuml-gradle/plantuml-plugin` | — | —
 |===
-
-_Localisation active_ : Sessions >= 053. Sessions <= 052 dans `.agents/backup/Y2026-sessions-042-052/`
-| 068 | 2026-05-04 | governance | renommage openclaw→quizz-benchmark | —

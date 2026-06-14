@@ -1,30 +1,17 @@
 = Historique des Sessions — Magic Stick
 
-_Derniere mise a jour_ : 2026-06-14 (session 078)
+_Derniere mise a jour_ : 2026-06-14 (session 079)
 
 |===
 | # | Date | Type | Sujet | Score
-| 078 | 14 juin 2026 | fix+ci+deploy | EPIC V-1 Validation Physique ISO TERMINÉ — Fix GPG transitoire (patch lb_chroot_devpts bind-mount /dev nodes), 7 commits itératifs. Build #34 SUCCESS, #38 SUCCESS complet (ISO + SourceForge + Docker Hub). ISO 5.4GB téléchargée, flash /dev/sda2 System B, GRUB default=1. | 8/10
-| 077 | 13 juin 2026 | fix+ci | Fix CI/CD pour Validation Physique ISO — 10 commits (live-media, cow_backend, overlay, casper patch, GPG tmpfs). Build #5 SUCCESS, builds #6→#14 GPG transitoire. Smoke test non-bloquant. Tag v0.1.14. | 5/10
-| 076 | 11 juin 2026 | migration | Migration CCCP : Docker Hub (cheroliv→cccpeducation) + SourceForge (cheroliv→cccp-education). Secrets GitHub, dockerHubJwt task, vault dockerhub.yml | 7/10
-| 075 | 28 mai 2026 | fix+ci | Retour -kernel/-initrd/-append avec live-media=/dev/sr0, cow_backend=tmpfs, rootdelay=10. Commit a728d4f push. | 6/10
-| 074 | 23 mai 2026 | fix+ci | Full ISO boot via -cdrom (abandon -kernel/-initrd + initrd patching), +console=ttyS0,115200 build, detection login prompt | 6/10
-| 073 | 23 mai 2026 | fix+ci | Fix Initrd Patching CI/CD — boucle candidates decompresseurs sans `file -b`, validation cpio magic bytes, multi-segment initrd handling | 7/10
-| 072 | 23 mai 2026 | fix+ci | Fix Smoke Test QEMU — ISO patching xorriso + -cdrom normal boot (remplace -kernel/-initrd qui cassait casper) | 8/10
-| 071 | 23 mai 2026 | fix+ci | Fix CI/CD ISO Build — 7 fixes iteratifs (Gradle problems-report + chown, python3.14→3.12, ripgrep 14.1.1→14.1.0, reproducibility non-blocking, set +e). Dernier push 1d45f81 en cours. | 8/10
-| 070 | 22 mai 2026 | fix + ci/cd + backlog | EPIC V-1 : fixes CI/CD (cache Docker + bakery plugin), checklist physique, flash merger, build en cours | 8/10
-| 064 | 01 mai 2026 | refactor + governance + audit | Audit contexte EAGER/LAZY : AGENT 388→198, INDEX 227→67, +GOVERNANCE_REFERENCE (-46%) | 8/10
-| 063 | 01 mai 2026 | feat + docs + backlog | EPIC 8 Docker Hub : docker-compose.yml + doc README/README_FR | 7/10
-| 062 | 01 mai 2026 | feat + ci/cd + backlog | EPIC 4 smoke tests CI/CD + EPIC 9 editeurs /opt/ TERMINE (vscode-update.sh + gradle tasks) | 8/10
-| 061 | 01 mai 2026 | backlog | EPIC 13 plateformes de jeu (Heroic, Prism, RetroArch, Itch) + EPIC 12 precision Roblox Studio | 7/10
-| 060 | 01 mai 2026 | backlog + governance | EPIC 12 Vinegar + Sober (Roblox) ajout dans BACKLOG.adoc (LAZY), audit contexte | 7/10
-| 059 | 01 mai 2026 | test + feat + backlog + governance | EPIC 4 validation live boot : test-software.sh (nmap/iperf3/wireshark/JDK/python3.14), httpie doc cleanup, statuts BACKLOG (EPICs 3/6/8/11 → TERMINE), smoke tests QEMU (smoke-test.sh + systemd + --smoke mode + Gradle) | 8/10
-| 058 | 01 mai 2026 | backlog + governance | EPIC 5 finalise BACKLOG (autostart OK depuis session 048) + planification EPIC 4 pour session 059 | 8/10
-| 057 | 01 mai 2026 | feat + ci/cd | EPIC 11 TERMINE : cache downloads CI/CD 3 strates + validation reproductibilite test-software.sh (14 outils) | 8/10
-| 056 | 01 mai 2026 | fix + ci/cd | EPIC 11 fix checksums lazygit casse Linux_x86_64 vs linux_x86_64 — grep -i. CI/CD VERT 0 warning | 8/10
-| 055 | 30 avril 2026 | governance + audit + refactor | Gouvernance agent complete audit 50 points (AGENT.adoc ~388, anti-patterns, audit 5 etapes, defense 3 couches, metaphore, backup) + application sur 5 projets | 9/10
-| 054 | 30 avril 2026 | fix + backlog | Fix checksums lazygit/just chroot + priorisation BACKLOG (traps EXIT + checksums [x]) | 8/10
-| 053 | 30 avril 2026 | fix + security + ci/cd + backlog | EPIC 11 P0.4-P0.7 fixes cumules (bug xh URL, just URL, checksums SHA256 chroot, trap EXIT build-inner.sh, cache-build CI/CD, BACKLOG mis a jour) | 8/10
+| 079 | 14 juin 2026 | feat+governance | EPIC V-1 UEFI ESP + Bootstrap Gradle Tasks — update-system.sh v0.3.0 (bios_grub+ESP dual boot Legacy+UEFI), 5 nouvelles tâches Gradle (isoCheckUSB, isoUpdateSystem, isoValidateUSB, isoTestPersistence, isoReleaseNotes), test-persistence-mock.sh et test-ab-partition.sh adaptés v0.3.0 (p5=persistence), clé USB repartitionnée 5 partitions. Boot UEFI + Legacy prêt. | 8/10
+| 078 | 14 juin 2026 | fix+ci+deploy | EPIC V-1 Validation Physique ISO — Fix GPG transitoire (patch lb_chroot_devpts bind-mount /dev nodes), 7 commits itératifs. Build #34 SUCCESS, #38 SUCCESS complet (ISO + SourceForge + Docker Hub). ISO 5.4GB téléchargée, flash /dev/sda2 System B, GRUB default=1. | 8/10
+| 077 | 13 juin 2026 | fix+ci | Fix CI/CD pour Validation Physique ISO — 10 commits (live-media, cow_backend, overlay, casper patch, GPG tmpfs). Build #5 SUCCESS, builds #6→#14 GPG transitoire. | 5/10
+| 076 | 11 juin 2026 | migration | Migration CCCP : Docker Hub (cheroliv→cccpeducation) + SourceForge (cheroliv→cccp-education). Secrets GitHub, dockerHubJwt task. | 7/10
+| 075 | 28 mai 2026 | fix+ci | Retour -kernel/-initrd/-append avec live-media=/dev/sr0, cow_backend=tmpfs, rootdelay=10. | 6/10
+| 074 | 23 mai 2026 | fix+ci | Full ISO boot via -cdrom (abandon -kernel/-initrd), +console=ttyS0,115200. | 6/10
+| 073 | 23 mai 2026 | fix+ci | Fix Initrd Patching CI/CD — multi-segment initrd, validation cpio magic. | 7/10
+| 072 | 23 mai 2026 | fix+ci | Fix Smoke Test QEMU — xorriso patching + -cdrom normal boot. | 8/10
+| 071 | 23 mai 2026 | fix+ci | Fix CI/CD ISO Build — 7 fixes (python3.12, ripgrep, set +e). | 8/10
+| 070 | 22 mai 2026 | fix+ci/cd+backlog | EPIC V-1 : fixes CI/CD + checklist physique + flash merger. | 8/10
 |===
-| 068 | 2026-05-04 | governance | Renommage openclaw→quizz-benchmark | -
-| 069 | 2026-05-07 | chore | Migration chemins foundry/ → foundry/OSS/ dans INDEX.adoc (granularisation OSS/CSS) | -

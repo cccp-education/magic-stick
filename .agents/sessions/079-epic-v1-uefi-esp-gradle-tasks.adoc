@@ -1,0 +1,59 @@
+= Session 079 — EPIC V-1 Repartition UEFI + Bootstrap Gradle Tasks
+:date: 2026-06-14
+:status: TERMINE
+:score: 8/10
+
+== Contexte
+
+EPIC V-1 bloqué : clé USB flashée mais boot impossible en mode UEFI natif.
+La clé n'avait pas de partition ESP (FAT32 `C12A7328`) — uniquement GRUB Legacy
+sur MBR + bios_grub. Les PCs modernes en UEFI-only ne voyaient pas le bootloader.
+
+== Actions
+
+=== update-system.sh v0.3.0 — Dual boot Legacy + UEFI
+
+Réécriture complète pour nouveau layout 5 partitions :
+- p1 : bios_grub (1 MiB, flag `bios_grub`)
+- p2 : ESP (512 MiB, FAT32, flag `esp`)
+- p3 : system_a (8 GiB)
+- p4 : system_b (8 GiB)
+- p5 : persistence (rest)
+
+Double installation GRUB :
+1. `grub-install --target=i386-pc` → MBR + bios_grub (Legacy BIOS) ✅
+2. `grub-install --target=x86_64-efi` → ESP/EFI/BOOT/BOOTX64.EFI (UEFI) ✅
+
+=== Gradle Tasks — 5 nouvelles tâches
+
+Dans `build.gradle.kts` :
+- `isoCheckUSB` — validate USB key (SHA256, verify, status). Host-only.
+- `isoUpdateSystem` — flash ISO to inactive A/B partition + GRUB switch. Host-only.
+- `isoValidateUSB` — pipeline check → flash
+- `isoTestPersistence` — static analysis persistence safety (Docker)
+- `isoReleaseNotes` — AsciiDoc release notes from conventional commits
+
+`isoTestFull` mis à jour pour inclure `isoTestPersistence`.
+
+=== Scripts adaptés v0.3.0
+
+- `test-persistence-mock.sh` : p3→p5 pour persistence
+- `test-ab-partition.sh` : layout 5 partitions (bios_grub + ESP + system_a + system_b + persistence)
+
+=== Clé USB repartitionnée
+
+| Part | Taille | Label | Contenu |
+| sda1 | 1 MB | bios_grub | GRUB Legacy |
+| sda2 | 512 MB | ESP (FAT32) | BOOTX64.EFI |
+| sda3 | 8 GB | system_a | magic-stick 0.1.14 |
+| sda4 | 8 GB | system_b | vide |
+| sda5 | 98 GB | persistence | / union |
+
+=== Résultat
+
+Clé prête pour boot UEFI ET Legacy. Plus aucun script orphelin — tout est
+couvert par des tâches Gradle. Seule la validation physique (sections 3-9
+de la checklist) nécessite un redémarrage.
+
+Reste à faire : redémarrer le PC sur la clé USB et cocher les 68 checks
+de `EPIC_V1_VALIDATION_CHECKLIST.adoc`.
