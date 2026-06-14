@@ -1,5 +1,5 @@
 = Backlog — Magic Stick
-:last_update: 2026-06-13 (Session 053+ — ISO fixes)
+:last_update: 2026-06-14 (Session 080)
 
 '''
 **Objectif** : Suivi des issues et taches en cours
@@ -10,10 +10,11 @@
 === EPIC 1 : Initialisation projet ✅
 === EPIC 3 : Partition A/B + Persistence ✅
 === EPIC 5 : Personnalisation XFCE ✅
-=== EPIC 6 : Script de mise à jour système A/B ✅
+=== EPIC 6 : Script de mise à jour système A/B ✅ (v0.3.0 dual boot UEFI+Legacy)
 === EPIC 8 : Dockerisation CLI (artefact parallèle) ✅
 === EPIC 9 : Éditeurs de code (VS Code, gh CLI) ✅
 === EPIC 11 : Pinning versions chroot + refactoring patterns ✅
+=== EPIC 14 : Migration CCCP — Docker Hub + SourceForge ✅ (session 076)
 
 == EPIC 2 : Build ISO Xubuntu de base 🔄 EN COURS
 
@@ -23,17 +24,16 @@
 * [x] live-build configuré, hooks chroot, ubiquity, QEMU+OVMF
 * [x] CI/CD GitHub Actions (build + verify + test + release)
 * [x] Première ISO générée (session 010)
-* [x] Release v0.1.0 sur SourceForge
+* [x] Release v0.1.14 sur SourceForge
 * [x] GRUB modules corrigés (session 013)
-* [x] Fix casper overlay (cow_backend=tmpfs, overlay module initramfs) — sessions récentes
+* [x] Fix casper overlay (cow_backend=tmpfs, overlay module initramfs)
 * [x] Fix QEMU boot (patch casper script)
+* [x] Support UEFI (hook 990-add-efi-support.binary, grubx64.efi + BOOTX64.EFI)
+* [x] Support Legacy BIOS (bios_grub partition, core.img avec modules ext2/gfxterm)
 
 === Restant
-* [ ] Tester boot BIOS sur cle USB réelle
-* [ ] Ajouter/supporter UEFI
-* [ ] Tester boot UEFI sur cle USB réelle
-* [ ] Auto-update du site de doc lors d'un déploiement
-* [ ] Générer notes de version via IA
+* [ ] Tester boot BIOS sur clé USB réelle
+* [ ] Tester boot UEFI sur clé USB réelle
 
 == EPIC 4 : Logiciels (Ollama, Docker, SDKMAN, NVM, etc.) 🔄 EN COURS
 
@@ -47,7 +47,25 @@
 * [x] CI/CD smoke tests validés
 
 === Restant
-* [ ] Tester en live boot réel sur cle USB
+* [ ] Tester en live boot réel sur clé USB
+
+== EPIC V-1 : Validation Physique ISO 🔄 EN COURS
+
+**Priorité** : CRITIQUE
+
+=== Réalisé
+* [x] update-system.sh v0.3.0 : layout GPT 5 partitions (bios_grub + ESP + system_a + system_b + persistence)
+* [x] GRUB dual boot Legacy (i386-pc) + UEFI (x86_64-efi) installé
+* [x] Fix core.img sans ext2 → prompt GRUB (session 080)
+* [x] Fix grub.cfg sortie série → gfxterm (session 080)
+* [x] UEFI grubx64.efi avec modules embarqués (Secure Boot ready)
+* [x] 6 tâches Gradle : isoSetupAB, isoCheckUSB, isoUpdateSystem, isoValidateUSB, isoTestPersistence, isoReleaseNotes
+* [x] test-persistence-mock.sh + test-ab-partition.sh adaptés v0.3.0
+* [x] Clé USB /dev/sda flashée : core.img 179 KB, grubx64.efi 2.3 MB, verify passe
+
+=== Restant
+* [ ] Boot physique sur machine réelle — Legacy BIOS
+* [ ] Boot physique sur machine réelle — UEFI
 
 == EPIC 7 : Site de doc auto + IA release notes
 
@@ -73,9 +91,3 @@
 
 **Priorité** : BASSE
 * [ ] Heroic Games Launcher, Prism Launcher, RetroArch, Itch.io
-
-== EPIC 14 : Migration CCCP — Bakery site statique 🔲 A FAIRE
-
-**Priorité** : MOYENNE
-* [ ] Mettre à jour site.yml credentials cccp-education
-* [ ] Vérifier déploiement gh-pages
