@@ -1,9 +1,10 @@
 = Historique des Sessions — Magic Stick
 
-_Derniere mise a jour_ : 2026-06-14 (session 079)
+_Derniere mise a jour_ : 2026-06-14 (session 080)
 
 |===
 | # | Date | Type | Sujet | Score
+| 080 | 14 juin 2026 | fix+deploy | Fix GRUB Boot Prompt + Flash Physique — core.img sans ext2 → prompt GRUB, grub.cfg série → pas de menu. --modules Legacy+UEFI, gfxterm, verify taille core.img, isoSetupAB task, clé re-flashée. | 9/10
 | 079 | 14 juin 2026 | feat+governance | EPIC V-1 UEFI ESP + Bootstrap Gradle Tasks — update-system.sh v0.3.0 (bios_grub+ESP dual boot Legacy+UEFI), 5 nouvelles tâches Gradle (isoCheckUSB, isoUpdateSystem, isoValidateUSB, isoTestPersistence, isoReleaseNotes), test-persistence-mock.sh et test-ab-partition.sh adaptés v0.3.0 (p5=persistence), clé USB repartitionnée 5 partitions. Boot UEFI + Legacy prêt. | 8/10
 | 078 | 14 juin 2026 | fix+ci+deploy | EPIC V-1 Validation Physique ISO — Fix GPG transitoire (patch lb_chroot_devpts bind-mount /dev nodes), 7 commits itératifs. Build #34 SUCCESS, #38 SUCCESS complet (ISO + SourceForge + Docker Hub). ISO 5.4GB téléchargée, flash /dev/sda2 System B, GRUB default=1. | 8/10
 | 077 | 13 juin 2026 | fix+ci | Fix CI/CD pour Validation Physique ISO — 10 commits (live-media, cow_backend, overlay, casper patch, GPG tmpfs). Build #5 SUCCESS, builds #6→#14 GPG transitoire. | 5/10

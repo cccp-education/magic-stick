@@ -152,15 +152,24 @@ tasks.register("isoPipeline") {
 
 tasks.register<org.gradle.api.tasks.Exec>("isoFlash") {
     group = "iso"
-    description = "Flash ISO to USB drive — pass device with -Pdevice=/dev/sdX"
-    dependsOn("dockerBuild")
-    val device = (project.findProperty("device") as? String) ?: "/dev/null"
-    commandLine("docker", "run", "--rm", "--privileged",
-        "--device", device,
-        "-v", "$projDir:/magic-stick",
-        dockerImage,
-        "/magic-stick/scripts/flash.sh", device)
-    onlyIf { project.hasProperty("device") }
+    description = "Initial A/B setup + flash ISO to USB (GPT 5 partitions, GRUB Legacy+UEFI with ext2/gfxterm modules)." +
+        " Host-only. Pass -Pdevice=/dev/sdX -PsudoPassword=..."
+    val device = (project.findProperty("device") as? String) ?: ""
+    val ci = System.getenv("CI") ?: ""
+    val isoFile = file("build/$isoName")
+    onlyIf { device.isNotEmpty() && ci.isEmpty() && isoFile.exists() }
+    val password = (project.findProperty("sudoPassword") as? String) ?: ""
+    val scriptDir = "$projDir/scripts"
+    commandLine("sudo", "-S", "bash", "-c",
+        "set -e; " +
+        "echo '=== A/B Setup + Flash (v0.3.0 + GRUB ext2/gfxterm fix) ==='; " +
+        "bash \"$scriptDir/update-system.sh\" -y setup-ab \"$device\" \"$isoFile\"; " +
+        "echo; " +
+        "echo '=== Post-flash Status ==='; " +
+        "bash \"$scriptDir/update-system.sh\" status \"$device\" || true; " +
+        "echo; " +
+        "echo '=== FLASH COMPLETE. Boot from USB to test. ==='")
+    standardInput = password.byteInputStream()
 }
 
 // ============================================================
@@ -169,7 +178,8 @@ tasks.register<org.gradle.api.tasks.Exec>("isoFlash") {
 
 tasks.register<org.gradle.api.tasks.Exec>("isoTestAB") {
     group = "iso"
-    description = "Test A/B partition setup on loopback device inside Docker (privileged)"
+    description = "Test A/B partition setup on loopback device inside Docker (privileged)." +
+        " Verifies GPT layout, GRUB ext2/gfxterm modules in core.img, persistence.conf"
     dependsOn("dockerBuild")
     // Runs test-ab-partition.sh inside Docker with all needed perms
     commandLine("docker", "run", "--rm", "--privileged",
@@ -209,8 +219,8 @@ tasks.register<org.gradle.api.tasks.Exec>("isoTestVNC") {
 
 tasks.register("isoTestFull") {
     group = "iso"
-    description = "Full test suite: verify + boot + A/B partition + persistence + software + smoke"
-    dependsOn("isoVerify", "isoTestPersistence", "isoTestSoftware", "isoTestSmoke")
+    description = "Full test suite: verify + boot + A/B partition (GPT+GRUB ext2/gfxterm) + persistence + software + smoke"
+    dependsOn("isoVerify", "isoTestAB", "isoTestPersistence", "isoTestSoftware", "isoTestSmoke")
     finalizedBy("isoTestBoot")
 }
 
@@ -315,9 +325,31 @@ tasks.register("dockerHubJwt") {
 // direct block device access (/dev/sdX, mount, GRUB install).
 // Skipped in CI (no physical USB key available).
 
+tasks.register<org.gradle.api.tasks.Exec>("isoSetupAB") {
+    group = "iso"
+    description = "Initial A/B setup: partition USB key (GPT 5 partitions), install GRUB (Legacy+UEFI with ext2/gfxterm modules), flash ISO to System A." +
+        " Host-only. Pass -Pdevice=/dev/sdX -PsudoPassword=..."
+    val device = (project.findProperty("device") as? String) ?: ""
+    val ci = System.getenv("CI") ?: ""
+    val isoFile = file("build/$isoName")
+    onlyIf { device.isNotEmpty() && ci.isEmpty() && isoFile.exists() }
+    val password = (project.findProperty("sudoPassword") as? String) ?: ""
+    val scriptDir = "$projDir/scripts"
+    commandLine("sudo", "-S", "bash", "-c",
+        "set -e; " +
+        "echo '=== A/B Setup (v0.3.0 + GRUB ext2/gfxterm fix) ==='; " +
+        "bash \"$scriptDir/update-system.sh\" -y setup-ab \"$device\" \"$isoFile\"; " +
+        "echo; " +
+        "echo '=== Post-setup Status ==='; " +
+        "bash \"$scriptDir/update-system.sh\" status \"$device\" || true; " +
+        "echo; " +
+        "echo '=== SETUP COMPLETE. Boot from USB to test. ==='")
+    standardInput = password.byteInputStream()
+}
+
 tasks.register<org.gradle.api.tasks.Exec>("isoCheckUSB") {
     group = "iso"
-    description = "Validate USB key (partitions, GRUB, system contents, ISO checksum)." +
+    description = "Validate USB key (partitions, GRUB with ext2/gfxterm, system contents, ISO checksum)." +
         " Host-only. Pass -Pdevice=/dev/sdX -PsudoPassword=..."
     val device = (project.findProperty("device") as? String) ?: ""
     val ci = System.getenv("CI") ?: ""
@@ -341,7 +373,7 @@ tasks.register<org.gradle.api.tasks.Exec>("isoCheckUSB") {
 
 tasks.register<org.gradle.api.tasks.Exec>("isoUpdateSystem") {
     group = "iso"
-    description = "Flash ISO to USB inactive A/B partition (active→inactive + GRUB switch)." +
+    description = "Flash ISO to USB inactive A/B partition (active→inactive + GRUB switch with ext2/gfxterm modules)." +
         " Host-only. Pass -Pdevice=/dev/sdX -PsudoPassword=..."
     val device = (project.findProperty("device") as? String) ?: ""
     val ci = System.getenv("CI") ?: ""

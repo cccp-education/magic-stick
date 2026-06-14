@@ -31,3 +31,26 @@
 | `.agents/sessions/063-epic8-dockerhub-doc.adoc` | tag Docker Hub |
 | `.agents/sessions/071-fix-ci-cd-iso-build.adoc` | repo URL |
 | `PROMPT_REPRISE.adoc` | GitHub URL |
+
+== Session 080 — Fix GRUB Boot Prompt + Flash Physique
+
+**Date** : 14 juin 2026
+**Type** : fix+deploy
+**Score** : 9/10
+
+=== Taches
+
+* [OK] Diagnostic : core.img sans ext2 → GRUB ne lit pas ext4 → prompt grub>
+* [OK] Diagnostic : grub.cfg force sortie série → pas de menu graphique
+* [OK] update-system.sh : --modules Legacy (ext2, gfxterm, etc.) + UEFI (ext2, fat, chain, efi_gop, efi_uga, etc.)
+* [OK] grub.cfg : gfxterm remplace serial, --- en fin de ligne kernel
+* [OK] verify : LANG=C parted, exclut p1 des labels, vérifie taille core.img > 100 KB
+* [OK] test-ab-partition.sh : vérif taille core.img (>100 KB = modules OK)
+* [OK] build.gradle.kts : isoSetupAB (nouveau), isoFlash → setup-ab, isoTestFull inclut isoTestAB
+* [OK] Flash physique clé USB /dev/sda : core.img 179 KB, grubx64.efi 2.3 MB, verify passe
+
+=== Fichiers modifies
+
+| `scripts/update-system.sh` | +70/-24 lignes |
+| `scripts/test-ab-partition.sh` | +13 lignes |
+| `build.gradle.kts` | +60/-24 lignes |

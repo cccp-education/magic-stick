@@ -140,6 +140,19 @@ cmd_test_partition() {
                     warn "GRUB BIOS boot.img not found"
                 fi
 
+                if [[ -f "${mount_point}/boot/grub/i386-pc/core.img" ]]; then
+                    pass "GRUB BIOS core.img present"
+                    local core_size
+                    core_size=$(stat -c%s "${mount_point}/boot/grub/i386-pc/core.img" 2>/dev/null || echo 0)
+                    if [[ "$core_size" -gt 100000 ]]; then
+                        pass "core.img is ${core_size} bytes (modules embedded: ext2, gfxterm, etc.)"
+                    else
+                        fail "core.img is only ${core_size} bytes — modules NOT embedded, GRUB will drop to prompt"
+                    fi
+                else
+                    warn "GRUB BIOS core.img not found"
+                fi
+
                 umount "$mount_point" 2>/dev/null || true
             else
                 warn "Cannot mount system_a partition"

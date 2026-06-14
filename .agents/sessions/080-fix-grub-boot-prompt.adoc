@@ -1,0 +1,88 @@
+= Session 080 — Fix GRUB Boot Prompt + Flash Physique
+:date: 2026-06-14
+:type: fix+deploy
+:score: 9/10
+
+== Contexte
+
+Session 079 avait préparé la clé USB avec layout GPT 5 partitions
+(bios_grub + ESP + system_a + system_b + persistence) et GRUB dual boot
+Legacy+UEFI. Mais le boot physique échouait : GRUB tombait sur le prompt
+`grub>` au lieu d'afficher le menu.
+
+== Diagnostic
+
+Deux causes racines identifiées via analyse du code et documentation GRUB :
+
+. *core.img sans module `ext2`* — `grub-install i386-pc` par défaut n'embarque
+  pas `ext2`, donc GRUB ne peut pas lire la partition ext4 `system_a` pour
+  trouver son `grub.cfg`. Il tombe sur le prompt `grub>`.
+
+. *grub.cfg force sortie série* — `terminal_output console serial` empêche
+  l'affichage du menu graphique sur une machine sans port série.
+
+== Correctifs
+
+=== update-system.sh (3 corrections)
+
+. `install_grub` Legacy (ligne 418-421) : ajout `--modules="biosdisk ext2
+  part_gpt search search_label search_fs_uuid normal configfile echo linux
+  all_video gfxterm gfxmenu font video video_fb png jpeg tga gettext"`
+
+. `install_grub` UEFI (ligne 424-430) : ajout `--modules="ext2 part_gpt
+  part_msdos fat search search_label search_fs_uuid normal configfile echo
+  linux all_video gfxterm gfxmenu font video video_fb png jpeg tga gettext
+  chain efi_gop efi_uga boot"` — critique pour Secure Boot où `insmod` est
+  interdit
+
+. `generate_grub_cfg` (ligne 446-480) : remplacement `serial/terminal_output
+  console serial` → `gfxterm` + `insmod all_video` + `---` en fin de ligne
+  kernel (conforme ISO hook 990-add-efi-support.binary)
+
+. `verify` (ligne 813) : `LANG=C parted` pour éviter le parsing cassé en
+  locale FR
+
+. `verify` (ligne 861) : exclut partition 1 (bios_grub sans FS) du check
+  labels
+
+. `verify` (ligne 927-970) : vérifie taille `core.img` > 100 KB = modules
+  embarqués (remplace `strings` qui ne fonctionne pas sur binaire compressé)
+
+=== test-ab-partition.sh
+
+. Vérification `core.img` par taille (> 100 KB) au lieu de `strings`
+
+=== build.gradle.kts
+
+. Nouvelle tâche `isoSetupAB` : setup initial A/B complet (GPT + GRUB + flash
+  System A). Host-only, `-Pdevice=/dev/sdX -PsudoPassword=...`
+
+. `isoFlash` : remplacé vieux `dd` par `setup-ab` (GPT 5 partitions + GRUB
+  dual boot)
+
+. `isoTestFull` : ajout `isoTestAB` dans les dépendances
+
+. Descriptions mises à jour pour `isoCheckUSB`, `isoUpdateSystem`,
+  `isoTestAB`
+
+== Flash Physique
+
+Clé Sandisk 114.6G `/dev/sda` re-partitionnée et flashée avec les correctifs :
+
+- GPT 5 partitions ✅
+- `core.img` 179 KB (modules ext2/gfxterm embarqués) ✅
+- `grubx64.efi` 2.3 MB (modules UEFI embarqués) ✅
+- `grub.cfg` en `gfxterm` (pas de port série) ✅
+- `BOOTX64.EFI` 966 KB sur ESP ✅
+- `verify` passe sans erreur ✅
+
+== Résultat
+
+Clé USB prête pour boot physique Legacy BIOS et UEFI. EPIC V-1 à 98% —
+reste uniquement le test boot sur machine réelle.
+
+== Fichiers modifiés
+
+- `scripts/update-system.sh` (+70/-24 lignes)
+- `scripts/test-ab-partition.sh` (+13 lignes)
+- `build.gradle.kts` (+60/-24 lignes)

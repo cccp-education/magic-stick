@@ -4,9 +4,9 @@ _Regles absolues_ : voir `AGENT.adoc`
 _Procedures_ : voir `LAZY_EAGER_ESSENTIALS.adoc`
 _Stockage backup_ : voir `.agents/GOVERNANCE_REFERENCE.adoc`
 
-_Derniere mise a jour_ : 2026-06-14 (session 079)
-_Session terminee_ : 079 — EPIC V-1 UEFI ESP + Bootstrap Gradle Tasks
-_Session en cours_ : 080 — Aucune mission définie
+_Derniere mise a jour_ : 2026-06-14 (session 080)
+_Session terminee_ : 080 — Fix GRUB Boot Prompt + Flash Physique
+_Session en cours_ : 081 — Boot physique + EPIC 7
 
 '''
 
@@ -14,6 +14,7 @@ _Session en cours_ : 080 — Aucune mission définie
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
+| 080 | 14 juin 2026 | fix+deploy | Fix GRUB Boot Prompt + Flash Physique — core.img sans ext2 → prompt GRUB, grub.cfg série → pas de menu. --modules Legacy+UEFI, gfxterm, verify taille core.img, isoSetupAB task, clé re-flashée. | `080-fix-grub-boot-prompt.adoc` | 9/10
 | 079 | 14 juin 2026 | feat+governance | EPIC V-1 UEFI ESP + Bootstrap Gradle Tasks — update-system.sh v0.3.0 (ESP+bios_grub dual boot), 5 Gradle tasks, scripts adaptés, clé repartitionnée. Boot possible en UEFI et Legacy. | `079-epic-v1-uefi-esp-gradle-tasks.adoc` | 8/10
 | 078 | 14 juin 2026 | fix+ci+deploy | EPIC V-1 Validation Physique ISO TERMINÉ — Fix GPG transitoire, Build #38 SUCCESS, flash System B | `078-epic-v1-validation-physique.adoc` | 8/10
 | 077 | 13 juin 2026 | fix+ci | Fix CI/CD pour Validation Physique ISO — 10 commits, Build #5 SUCCESS | `077-fix-ci-cd-validation-physique.adoc` | 5/10

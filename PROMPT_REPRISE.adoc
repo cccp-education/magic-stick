@@ -1,23 +1,30 @@
-= PROMPT REPRISE — magic-stick Session 080
+= PROMPT REPRISE — magic-stick Session 081
 :date: 2026-06-14
 
 == Mission en cours
 
-*Aucune.* EPIC V-1 prêt pour boot physique. Clé USB repartitionnée
-avec support UEFI+Legacy, ISO v0.1.14 flashé sur System A.
+*Aucune.* EPIC V-1 prêt pour boot physique. Clé USB flashée avec
+correctifs GRUB (ext2/gfxterm modules). Reste uniquement le test
+boot sur machine réelle.
 
 == Dernière action
 
-Session 079 — EPIC V-1 UEFI ESP + Bootstrap Gradle Tasks :
-- `update-system.sh` v0.3.0 : layout 5 partitions (bios_grub + ESP + system_a + system_b + persistence)
-- Double boot GRUB installé : Legacy (i386-pc) + UEFI (x86_64-efi avec BOOTX64.EFI)
-- 5 nouvelles tâches Gradle : `isoCheckUSB`, `isoUpdateSystem`, `isoValidateUSB`, `isoTestPersistence`, `isoReleaseNotes` — tout couvert, zéro script orphelin
-- `test-persistence-mock.sh` + `test-ab-partition.sh` adaptés v0.3.0
-- Clé USB réinitialisée : `/dev/sda`, 5 partitions, v0.1.14 sur System A, GRUB default=0
+Session 080 — Fix GRUB Boot Prompt + Flash Physique :
+- Diagnostic : `core.img` sans module `ext2` → GRUB ne lit pas ext4 → prompt
+- Diagnostic : `grub.cfg` force sortie série → pas de menu graphique
+- `update-system.sh` : `--modules` Legacy (ext2, gfxterm, etc.) + UEFI
+  (ext2, fat, chain, efi_gop, efi_uga, etc.)
+- `grub.cfg` : `gfxterm` remplace `serial`, `---` en fin de ligne kernel
+- `verify` : `LANG=C parted`, exclut p1 des labels, vérifie taille core.img
+- `test-ab-partition.sh` : vérif taille core.img (>100 KB = modules OK)
+- `build.gradle.kts` : nouvelle tâche `isoSetupAB`, `isoFlash` → setup-ab,
+  `isoTestFull` inclut `isoTestAB`
+- Clé USB `/dev/sda` re-flashée : core.img 179 KB, grubx64.efi 2.3 MB,
+  verify passe sans erreur
 
-== A faire (Session 080)
+== A faire (Session 081)
 
-. Boot physique sur clé USB — Legacy BIOS et/ou UEFI, checklist EPIC_V1_VALIDATION_CHECKLIST.adoc
+. Boot physique sur clé USB — Legacy BIOS et/ou UEFI
 . EPIC 7 — Site doc auto + IA release notes — 1%, BASSE
 
 == Rappels
