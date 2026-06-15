@@ -1,31 +1,40 @@
 = PROMPT REPRISE — magic-stick Session 082
-:date: 2026-06-14
+:date: 2026-06-15
 
 == Mission en cours
 
-EPIC 15 Network Boot & Remote Provisioning — ~25% done.
-- US-1 : `scripts/network-boot.sh` — dnsmasq proxy DHCP + TFTP + Python HTTP (kernel/initrd)
-- US-2 : `magic-stick.ipxe` généré auto — manque compilation iPXE + clé USB fallback
-- US-3 : `scripts/wake-laptops.sh` — WoL (etherwake + Python fallback)
-- US-5 : 4 tâches Gradle dans `build.gradle.kts`
-- US-4 : Hook chroot SSH — à implémenter
-- US-6 : Test QEMU + doc — à implémenter
+EPIC 16 Virtual Appliance (VPS/QEMU/KVM) — 60% done (US-1→5 faits, US-6 restant).
++ ISOLINUX 4 modes BIOS — fichiers créés, à vérifier au rebuild.
 
 == Dernière action
 
-Session 081 — EPIC 15 Gradle tasks + scripts :
-- `build.gradle.kts` : `isoNetworkBoot`, `isoWakeLaptops`, `isoProvisionNetwork`, `isoNetworkTest`
-- `scripts/network-boot.sh` (5047 bytes, testé syntaxe OK)
-- `scripts/wake-laptops.sh` (2395 bytes, testé syntaxe OK)
-- BACKLOG/TODO/INDEX mis à jour, EPIC 15 à 25%
-- Commit + push : `c078a7f` (Gradle tasks) + session 081
+Session 081 — EPIC 16 Virtual Appliance + ISOLINUX 4 modes :
+- US-1 : Hook 055-virtual-appliance.chroot (serial-getty, SSH, virtio, headless detect)
+- US-1 : openssh-server + open-infrastructure-system-config dans package list
+- US-1 : magic-stick-welcome.desktop wrapper headless
+- US-2 : GRUB Headless serial entry dans 990-add-efi-support.binary
+- US-3 : ISOLINUX custom menu 4 modes BIOS (6 fichiers dans includes.binary/isolinux/)
+- US-4 : scripts/virtual-appliance.sh + Gradle isoVirtualAppliance
+- US-5 : docs/VIRTUAL_APPLIANCE.adoc
+- Fix build-inner.sh : patch lb_chroot_live-packages (live-config-sysvinit obsolète)
+- Bump 0.1.14 → 0.1.15
+- Commit + push : `1f675f5`
+
+== Bloqueur actif
+
+Build ISO 0.1.15 échoue sur `lb_chroot_live-packages` :
+`open-infrastructure-system-config` conflitte avec `live-config`/`live-config-systemd`.
+Le patch sed `s/ live-config.*"/"/` dans build-inner.sh est en place mais non retesté.
 
 == A faire (Session 082)
 
-. US-4 : Hook chroot SSH (`config/live-build/hooks/`) + autorisation clé
-. US-2 : Compilation iPXE + script embarqué (`build/undionly.kpxe`)
-. US-6 : Test QEMU 2 clients PXE + doc NETWORK_BOOT.adoc
-. Boot physique clé USB pour valider V-1
+. Terminer le fix live-config → rebuild ISO 0.1.15 (isoPurge + isoBuild)
+. Tester VNC : vérifier 4 modes ISOLINUX BIOS + entrée GRUB Headless serial
+. EPIC 16 US-6 : Test QEMU headless (boot qcow2, SSH + serial-getty + virtio)
+. EPIC 16 US-6 : Tâche Gradle isoTestVirtual
+. Publier ISO 0.1.15 sur SourceForge
+. Publier image Docker CLI sur DockerHub
+. EPIC 15 US-4 : Hook chroot SSH (vérifier si déjà couvert par 055)
 
 == Rappels
 
@@ -33,3 +42,4 @@ Session 081 — EPIC 15 Gradle tasks + scripts :
 . Remote : cccp-education/magic-stick
 . Clé USB : /dev/sda, 5 partitions, System A=v0.1.14, System B=vide
 . sudo password dans `mdp.txt` (`issa`)
+. Build ISO : 30-60 min, lancer avec timeout long

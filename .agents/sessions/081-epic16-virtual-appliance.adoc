@@ -1,0 +1,75 @@
+= Session 081 — EPIC 16 Virtual Appliance + ISOLINUX 4 modes BIOS
+
+_Date_ : 2026-06-14/15
+_Type_ : feat+fix+governance
+_Score_ : 7/10
+
+'''
+
+== Contexte
+
+Session démarrée sur question utilisateur : "est-ce que la magic-stick propose les 3 modes au démarrage ?"
+→ Audit révèle que le menu ISOLINUX (Legacy BIOS) n'a que 2 entrées (Live + failsafe),
+contre 4 en GRUB UEFI. `install.cfg` vide (`# FIXME`).
+
+L'utilisateur demande aussi de garantir la capacité virtualisation (ISO bootable QEMU sur VPS).
+
+'''
+
+== Tâches réalisées
+
+=== ISOLINUX 4 modes BIOS (US-3)
+* [OK] Création `config/live-build/includes.binary/isolinux/` (6 fichiers)
+* [OK] `live.cfg` : 3 entrées (Live, nomodeset, safe mode)
+* [OK] `install.cfg` : 1 entrée (Install, only-ubiquity)
+* [OK] `menu.cfg`, `stdmenu.cfg`, `splash.png` extraits de l'ISO existante
+* [OK] Menu ISOLINUX Legacy BIOS identique au GRUB UEFI (4 modes)
+
+=== EPIC 16 Virtual Appliance (US-1, US-2, US-4, US-5)
+* [OK] Hook `055-virtual-appliance.chroot` : serial-getty@ttyS0, SSH host keys firstboot, virtio modules initramfs, headless detection script
+* [OK] `openssh-server` + `open-infrastructure-system-config` dans `live.list.chroot`
+* [OK] `magic-stick-welcome.sh` patché pour mode headless
+* [OK] `magic-stick-welcome.desktop` wrapper avec détection headless
+* [OK] Entrée GRUB "Headless (serial console)" dans `990-add-efi-support.binary`
+* [OK] `scripts/virtual-appliance.sh` : qemu-img create qcow2
+* [OK] Tâche Gradle `isoVirtualAppliance`
+* [OK] `docs/VIRTUAL_APPLIANCE.adoc`
+
+=== Fix build Ubuntu 24.04
+* [OK] Patch `lb_chroot_live-packages` dans `build-inner.sh` : suppression `live-config live-config-${LB_INITSYSTEM}` (obsolète, remplacé par `open-infrastructure-system-config`)
+
+=== Gouvernance
+* [OK] BACKLOG.adoc : +EPIC 16 (6 US)
+* [OK] .agents/INDEX.adoc : +EPIC 16, session 081
+* [OK] TODO.adoc : +EPIC 16 items
+* [OK] Bump version 0.1.14 → 0.1.15
+* [OK] Commit + push : `1f675f5` (21 fichiers, 711 insertions)
+
+'''
+
+== Résultats
+
+| Métrique | Valeur |
+|----------|--------|
+| Fichiers créés | 11 |
+| Fichiers modifiés | 9 |
+| EPICs créés | 1 (EPIC 16, 6 US) |
+| Version | 0.1.14 → 0.1.15 |
+| Build ISO | ÉCHEC (live-config-sysvinit, patch en cours) |
+| Commit | `1f675f5` pushé sur cccp-education/magic-stick |
+
+'''
+
+== Bloqueurs
+
+* Build ISO 0.1.15 échoue sur `lb_chroot_live-packages` — `open-infrastructure-system-config` conflitte avec `live-config`/`live-config-systemd`. Le patch sed dans `build-inner.sh` supprime la ligne `live-config` mais le build n'a pas été retesté après le dernier fix.
+
+'''
+
+== Prochaine session (082)
+
+* Terminer le fix `live-config-sysvinit` → rebuild ISO 0.1.15
+* Tester VNC (vérifier 4 modes ISOLINUX + headless GRUB)
+* EPIC 16 US-6 : Test QEMU headless (boot qcow2, SSH + serial-getty)
+* Publier sur SourceForge + DockerHub
+* EPIC 15 US-4 : Hook chroot SSH (si pas déjà fait par 055)

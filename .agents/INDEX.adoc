@@ -4,9 +4,9 @@ _Regles absolues_ : voir `AGENT.adoc`
 _Procedures_ : voir `LAZY_EAGER_ESSENTIALS.adoc`
 _Stockage backup_ : voir `.agents/GOVERNANCE_REFERENCE.adoc`
 
-_Derniere mise a jour_ : 2026-06-14 (session 081 — EPIC 16 Virtual Appliance)
-_Session terminee_ : 080 — Fix GRUB Boot Prompt + Flash Physique
-_Session en cours_ : 081 — EPIC 16 Virtual Appliance + ISOLINUX 4 modes
+_Derniere mise a jour_ : 2026-06-15 (session 081 — EPIC 16 Virtual Appliance)
+_Session terminee_ : 081 — EPIC 16 Virtual Appliance + ISOLINUX 4 modes BIOS
+_Session en cours_ : 082 — Fix build live-config + rebuild ISO 0.1.15
 
 '''
 
