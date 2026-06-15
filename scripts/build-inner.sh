@@ -24,7 +24,7 @@ mkdir -p "$TMPDIR" && chmod 1777 "$TMPDIR"
 # Downloaded tarballs/scripts survive across CI/CD runs via
 # GitHub Actions cache on build/cache/downloads/.
 # ============================================================
-DL_CACHE="${BUILD_DIR}/cache/downloads"
+DL_CACHE="${PROJECT_DIR}/cache/downloads"
 mkdir -p "${DL_CACHE}"
 # Pre-cache: copy to DL_CACHE if any files exist from host cache
 if ls "${DL_CACHE}"/* >/dev/null 2>&1; then

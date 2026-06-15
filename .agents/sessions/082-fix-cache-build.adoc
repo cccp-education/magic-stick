@@ -1,0 +1,74 @@
+= Session 082 — Fix Cache Downloads + Rebuild ISO 0.1.15
+:date: 2026-06-15
+:score: 6/10
+
+== Objectifs
+
+. Terminer le fix live-config → rebuild ISO 0.1.15
+. Tester VNC : vérifier 4 modes ISOLINUX BIOS + entrée GRUB Headless serial
+. EPIC 16 US-6 : Test QEMU headless + Gradle isoTestVirtual
+. Publier ISO 0.1.15 sur SourceForge
+. Publier image Docker CLI sur DockerHub
+
+== Réalisé
+
+=== Fix Cache Downloads (hors build/)
+
+*Problème* : `build-inner.sh:27` plaçait `DL_CACHE` dans `build/cache/downloads/`.
+Le `lb clean` en fin de build et `isoPurge` rasaient tout `build/`, détruisant
+les tarballs/binaires téléchargés (ripgrep, fd, lazygit, opencode, VS Code, etc.)
+à chaque cycle Gradle. Le build avait atteint 26GB+.
+
+*Correctif* :
+- `DL_CACHE` migré de `${BUILD_DIR}/cache/downloads` → `${PROJECT_DIR}/cache/downloads`
+- `cache/downloads/` créé à la racine projet (hors `build/`)
+- `cache/` ajouté au `.gitignore`
+- Le cache survit à `lb clean`, `isoPurge`, `isoClean`
+- Volume Docker `-v "$projDir:/magic-stick"` rend `cache/` accessible dans le conteneur
+
+=== Fix Doublon package list
+
+`open-infrastructure-system-config` apparaissait 2 fois dans `live.list.chroot`.
+Corrigé → 1 seule entrée.
+
+=== Tentative Rebuild ISO 0.1.15
+
+- `isoPurge` + `isoBuild` lancé
+- Tous les hooks passaient (060-install-chroot-software, XFCE customization en cours)
+- **Patch live-config confirmé fonctionnel** : le `sed` supprime `live-config*` du script
+  `lb_chroot_live-packages`, le conflit avec `open-infrastructure-system-config` est résolu
+- **Build interrompu** : disque saturé à 99% (7.1GB libres), chroot 12GB + cache 2.6GB
+  ont rempli l'espace avant génération ISO
+
+=== Nettoyage Espace Disque
+
+- `isoClean` échoué (Gradle ne pouvait créer `build/reports/problems`)
+- Nettoyage direct Docker : `lb clean` + `rm -rf chroot cache binary tmp`
+- Suppression caches Gradle anciens : `modules-2/`, `9.3.0/`, `9.5.0/`, `jars-9/`, `9.4.1/`, `8.14/` (~3.8GB)
+- Conservé : `9.5.1/` (version active), `build-cache-1/`, `journal-1/`
+- `~/.local/share/opencode/` (4.9GB) NON touché — données de session précieuses
+- Résultat : 25GB libres (suffisant pour rebuild)
+
+== Non Réalisé (reporté Session 083)
+
+. Rebuild ISO 0.1.15 complet → `./gradlew isoBuild`
+. Test VNC 4 modes ISOLINUX BIOS + GRUB Headless serial
+. EPIC 16 US-6 : Test QEMU headless + Gradle isoTestVirtual
+. Publication SourceForge + DockerHub
+. EPIC 15 US-4 : Hook chroot SSH (vérifier si couvert par 055)
+
+== Fichiers Modifiés
+
+|===
+| Fichier | Changement
+| `.gitignore` | +1 ligne `cache/`
+| `scripts/build-inner.sh` | `DL_CACHE` → `${PROJECT_DIR}/cache/downloads`
+| `config/live-build/package-lists/live.list.chroot` | -1 doublon `open-infrastructure-system-config`
+|===
+
+== Leçons
+
+. Le build ISO nécessite ~30GB d'espace disque (chroot 12GB + cache 2.6GB + binary + ISO)
+. Le cache downloads doit être hors `build/` pour survivre aux cycles Gradle
+. `~/.gradle/caches/` peut accumuler 6.6GB+ d'anciennes versions — nettoyage périodique utile
+. Ne jamais toucher `~/.local/share/opencode/` — historique de sessions précieux

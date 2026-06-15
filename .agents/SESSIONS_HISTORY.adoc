@@ -1,9 +1,10 @@
 = Historique des Sessions — Magic Stick
 
-_Derniere mise a jour_ : 2026-06-15 (session 081)
+_Derniere mise a jour_ : 2026-06-15 (session 082)
 
 |===
 | # | Date | Type | Sujet | Score
+| 082 | 15 juin 2026 | fix+governance | Fix Cache Downloads + tentative rebuild ISO 0.1.15 — DL_CACHE migré hors build/ → cache/downloads/, doublon open-infrastructure-system-config corrigé, patch live-config confirmé fonctionnel, build interrompu (disque saturé), nettoyage Gradle caches (~3.8GB). | 6/10
 | 081 | 14-15 juin 2026 | feat+fix+governance | EPIC 16 Virtual Appliance + ISOLINUX 4 modes BIOS — Hook 055 (serial-getty, SSH, virtio, headless), GRUB Headless serial entry, ISOLINUX custom menu 4 modes, virtual-appliance.sh + Gradle task, docs/VIRTUAL_APPLIANCE.adoc, fix build-inner.sh (live-config-sysvinit obsolète), bump 0.1.15. Build ISO échoue (live-config conflit, patch en place). | 7/10
 | 080 | 14 juin 2026 | fix+deploy | Fix GRUB Boot Prompt + Flash Physique — core.img sans ext2 → prompt GRUB, grub.cfg série → pas de menu. --modules Legacy+UEFI, gfxterm, verify taille core.img, isoSetupAB task, clé re-flashée. | 9/10
 | 079 | 14 juin 2026 | feat+governance | EPIC V-1 UEFI ESP + Bootstrap Gradle Tasks — update-system.sh v0.3.0 (bios_grub+ESP dual boot Legacy+UEFI), 5 nouvelles tâches Gradle (isoCheckUSB, isoUpdateSystem, isoValidateUSB, isoTestPersistence, isoReleaseNotes), test-persistence-mock.sh et test-ab-partition.sh adaptés v0.3.0 (p5=persistence), clé USB repartitionnée 5 partitions. Boot UEFI + Legacy prêt. | 8/10

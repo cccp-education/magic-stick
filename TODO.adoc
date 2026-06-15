@@ -1,5 +1,5 @@
 = TODO — Magic Stick
-:last_update: 2026-06-14 (Session 081)
+:last_update: 2026-06-15 (Session 082)
 
 _Pense-bête informel. Pour les priorités, voir BACKLOG.adoc_
 

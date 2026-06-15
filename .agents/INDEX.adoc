@@ -4,9 +4,9 @@ _Regles absolues_ : voir `AGENT.adoc`
 _Procedures_ : voir `LAZY_EAGER_ESSENTIALS.adoc`
 _Stockage backup_ : voir `.agents/GOVERNANCE_REFERENCE.adoc`
 
-_Derniere mise a jour_ : 2026-06-15 (session 081 — EPIC 16 Virtual Appliance)
-_Session terminee_ : 081 — EPIC 16 Virtual Appliance + ISOLINUX 4 modes BIOS
-_Session en cours_ : 082 — Fix build live-config + rebuild ISO 0.1.15
+_Derniere mise a jour_ : 2026-06-15 (session 082 — Fix Cache Downloads + tentative rebuild)
+_Session terminee_ : 082 — Fix Cache Downloads + tentative rebuild ISO 0.1.15
+_Session en cours_ : 083 — Rebuild ISO 0.1.15 + test VNC + EPIC 16 US-6
 
 '''
 
@@ -14,6 +14,7 @@ _Session en cours_ : 082 — Fix build live-config + rebuild ISO 0.1.15
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
+| 082 | 15 juin 2026 | fix+governance | Fix Cache Downloads + tentative rebuild ISO 0.1.15 — DL_CACHE migré hors build/ → cache/downloads/, doublon open-infrastructure-system-config corrigé, patch live-config confirmé fonctionnel, build interrompu (disque saturé), nettoyage Gradle caches (~3.8GB). | `082-fix-cache-build.adoc` | 6/10
 | 080 | 14 juin 2026 | fix+deploy | Fix GRUB Boot Prompt + Flash Physique — core.img sans ext2 → prompt GRUB, grub.cfg série → pas de menu. --modules Legacy+UEFI, gfxterm, verify taille core.img, isoSetupAB task, clé re-flashée. | `080-fix-grub-boot-prompt.adoc` | 9/10
 | 079 | 14 juin 2026 | feat+governance | EPIC V-1 UEFI ESP + Bootstrap Gradle Tasks — update-system.sh v0.3.0 (ESP+bios_grub dual boot), 5 Gradle tasks, scripts adaptés, clé repartitionnée. Boot possible en UEFI et Legacy. | `079-epic-v1-uefi-esp-gradle-tasks.adoc` | 8/10
 | 078 | 14 juin 2026 | fix+ci+deploy | EPIC V-1 Validation Physique ISO TERMINÉ — Fix GPG transitoire, Build #38 SUCCESS, flash System B | `078-epic-v1-validation-physique.adoc` | 8/10

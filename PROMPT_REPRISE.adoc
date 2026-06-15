@@ -1,4 +1,4 @@
-= PROMPT REPRISE — magic-stick Session 082
+= PROMPT REPRISE — magic-stick Session 083
 :date: 2026-06-15
 
 == Mission en cours
@@ -8,27 +8,22 @@ EPIC 16 Virtual Appliance (VPS/QEMU/KVM) — 60% done (US-1→5 faits, US-6 rest
 
 == Dernière action
 
-Session 081 — EPIC 16 Virtual Appliance + ISOLINUX 4 modes :
-- US-1 : Hook 055-virtual-appliance.chroot (serial-getty, SSH, virtio, headless detect)
-- US-1 : openssh-server + open-infrastructure-system-config dans package list
-- US-1 : magic-stick-welcome.desktop wrapper headless
-- US-2 : GRUB Headless serial entry dans 990-add-efi-support.binary
-- US-3 : ISOLINUX custom menu 4 modes BIOS (6 fichiers dans includes.binary/isolinux/)
-- US-4 : scripts/virtual-appliance.sh + Gradle isoVirtualAppliance
-- US-5 : docs/VIRTUAL_APPLIANCE.adoc
-- Fix build-inner.sh : patch lb_chroot_live-packages (live-config-sysvinit obsolète)
-- Bump 0.1.14 → 0.1.15
-- Commit + push : `1f675f5`
+Session 082 — Fix Cache Downloads + tentative rebuild ISO 0.1.15 :
+- Fix cache downloads : `DL_CACHE` migré hors `build/` → `cache/downloads/` (persiste entre cycles Gradle)
+- Fix doublon `open-infrastructure-system-config` dans `live.list.chroot`
+- Patch live-config **confirmé fonctionnel** : hooks passent, conflit résolu
+- Build ISO interrompu : disque saturé (chroot 12GB + cache 2.6GB > 21GB libres)
+- Nettoyage Gradle caches anciens (~3.8GB) → 25GB libres
+- `~/.local/share/opencode/` (4.9GB) préservé — données de session précieuses
 
 == Bloqueur actif
 
-Build ISO 0.1.15 échoue sur `lb_chroot_live-packages` :
-`open-infrastructure-system-config` conflitte avec `live-config`/`live-config-systemd`.
-Le patch sed `s/ live-config.*"/"/` dans build-inner.sh est en place mais non retesté.
+*Aucun.* Patch live-config fonctionnel. Espace disque suffisant (25GB).
+Le build ISO 0.1.15 est prêt à être relancé.
 
-== A faire (Session 082)
+== A faire (Session 083)
 
-. Terminer le fix live-config → rebuild ISO 0.1.15 (isoPurge + isoBuild)
+. Rebuild ISO 0.1.15 → `./gradlew isoBuild` (timeout 120 min, ~30GB requis)
 . Tester VNC : vérifier 4 modes ISOLINUX BIOS + entrée GRUB Headless serial
 . EPIC 16 US-6 : Test QEMU headless (boot qcow2, SSH + serial-getty + virtio)
 . EPIC 16 US-6 : Tâche Gradle isoTestVirtual
@@ -43,3 +38,5 @@ Le patch sed `s/ live-config.*"/"/` dans build-inner.sh est en place mais non re
 . Clé USB : /dev/sda, 5 partitions, System A=v0.1.14, System B=vide
 . sudo password dans `mdp.txt` (`issa`)
 . Build ISO : 30-60 min, lancer avec timeout long
+. Cache downloads : `cache/downloads/` (hors build/, persiste entre cycles)
+. Espace disque minimum pour build : ~30GB

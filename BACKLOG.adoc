@@ -1,5 +1,5 @@
 = Backlog — Magic Stick
-:last_update: 2026-06-14 (Session 080)
+:last_update: 2026-06-15 (Session 082)
 
 '''
 **Objectif** : Suivi des issues et taches en cours
