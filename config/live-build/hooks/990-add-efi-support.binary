@@ -105,6 +105,14 @@ menuentry "Magic Stick - Install" {
     linux /${KERNEL_NAME} boot=casper username=magic hostname=magic-stick locales=fr_FR.UTF-8 keyboard-layouts=fr quiet splash only-ubiquity ---
     initrd /${INITRD_NAME}
 }
+
+menuentry "Magic Stick - Headless (serial console)" {
+    serial --unit=0 --speed=115200
+    terminal_input serial
+    terminal_output serial
+    linux /${KERNEL_NAME} boot=casper username=magic hostname=magic-stick locales=fr_FR.UTF-8 keyboard-layouts=fr nomodeset console=ttyS0,115200 virtual=true ---
+    initrd /${INITRD_NAME}
+}
 GRUBCFG
 
 echo "  OK: Created grub.cfg with casper entries"

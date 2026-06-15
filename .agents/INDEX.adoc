@@ -4,9 +4,9 @@ _Regles absolues_ : voir `AGENT.adoc`
 _Procedures_ : voir `LAZY_EAGER_ESSENTIALS.adoc`
 _Stockage backup_ : voir `.agents/GOVERNANCE_REFERENCE.adoc`
 
-_Derniere mise a jour_ : 2026-06-14 (session 080)
+_Derniere mise a jour_ : 2026-06-14 (session 081 — EPIC 16 Virtual Appliance)
 _Session terminee_ : 080 — Fix GRUB Boot Prompt + Flash Physique
-_Session en cours_ : 081 — Boot physique + EPIC 7
+_Session en cours_ : 081 — EPIC 16 Virtual Appliance + ISOLINUX 4 modes
 
 '''
 
@@ -47,7 +47,8 @@ _Session en cours_ : 081 — Boot physique + EPIC 7
 | EPIC 12 : Vinegar + Sober (Roblox) | 0% | BASSE
 | EPIC 13 : Plateformes jeu (Flatpak) | 0% | BASSE
 | EPIC 14 : Migration CCCP | 100% TERMINE | MOYENNE
-| EPIC 15 : Network Boot & Remote Provisioning | 0% (6 US cadrées) | MOYENNE
+| EPIC 15 : Network Boot & Remote Provisioning | 25% (scripts US-1,3,5 + Gradle tasks) | MOYENNE
+| EPIC 16 : Virtual Appliance (VPS/QEMU/KVM) | 60% (US-1→5 faits, US-6 test restant) | HAUTE
 | EPIC V-1 : Validation Physique ISO | 98% (boot hardware restant uniquement, UEFI+Legacy prêt) | CRITIQUE
 |===
 
@@ -59,7 +60,7 @@ Projets gerant la meme methodologie opencode :
 
 |===
 | Projet | Repertoire | Version | Derniere maj
-| magic-stick | `~/workspace/foundry/public/magic-stick` | 079 | 2026-06-14
+| magic-stick | `~/workspace/foundry/public/magic-stick` | 081 | 2026-06-14
 | bakery-gradle | `~/workspace/foundry/public/bakery-gradle/bakery-plugin` | — | —
 | plantuml-gradle | `~/workspace/foundry/public/plantuml-gradle/plantuml-plugin` | — | —
 |===

@@ -1,5 +1,5 @@
 = TODO — Magic Stick
-:last_update: 2026-06-14 (Session 080)
+:last_update: 2026-06-14 (Session 081)
 
 _Pense-bête informel. Pour les priorités, voir BACKLOG.adoc_
 
@@ -10,4 +10,12 @@ _Pense-bête informel. Pour les priorités, voir BACKLOG.adoc_
 * EPIC 10 : Applications Docker (BigBlueButton, Rahoot, Formbricks, etc.)
 * EPIC 12 : Vinegar + Sober (Roblox)
 * EPIC 13 : Plateformes jeu (Heroic, Prism, RetroArch, Itch)
-* EPIC 15 : Network Boot & Remote Provisioning (PXE/iPXE, dnsmasq, WoL, SSH)
+* EPIC 15 US-1 : `network-boot.sh` écrit (dnsmasq proxy DHCP + TFTP + HTTP kernel/initrd)
+* EPIC 15 US-2 : `magic-stick.ipxe` généré, TFTP serve ready — manque compilation iPXE + clé USB fallback
+* EPIC 15 US-3 : `wake-laptops.sh` écrit (etherwake + Python fallback)
+* EPIC 15 US-5 : 4 tâches Gradle dans `build.gradle.kts` (isoNetworkBoot, isoWakeLaptops, isoProvisionNetwork, isoNetworkTest)
+* EPIC 15 US-4 : Hook chroot SSH à faire
+* EPIC 15 US-6 : Test QEMU + doc à faire
+* EPIC 16 US-6 : Test QEMU headless (boot qcow2, SSH + serial-getty + virtio)
+* EPIC 16 US-6 : Tâche Gradle isoTestVirtual
+* EPIC 16 US-5 : Mettre à jour README pour mode virtual appliance

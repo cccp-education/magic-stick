@@ -134,6 +134,12 @@ python3 "${CONFIG_DIR}/patches/patch-apt.py" || true
 echo "Patching lb_chroot_devpts to bind-mount /dev into chroot (overlay2 lacks device nodes)..."
 python3 "${CONFIG_DIR}/patches/patch-devpts.py" || true
 
+echo "Patching lb_chroot_live-packages (remove live-config for Ubuntu 24.04)..."
+LIVE_PKG_SCRIPT="/usr/lib/live/build/lb_chroot_live-packages"
+if [ -f "${LIVE_PKG_SCRIPT}" ]; then
+    sed -i 's/ live-config.*"/"/' "${LIVE_PKG_SCRIPT}"
+fi
+
 DISK_SCRIPT="/usr/lib/live/build/lb_binary_disk"
 if [ -f "${DISK_SCRIPT}" ]; then
     sed -i 's#unmkinitramfs "../../${INITRD}" .#unmkinitramfs "../../${INITRD}" . || true#g' "${DISK_SCRIPT}"

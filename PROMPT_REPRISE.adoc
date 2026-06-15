@@ -1,36 +1,35 @@
-= PROMPT REPRISE — magic-stick Session 081
+= PROMPT REPRISE — magic-stick Session 082
 :date: 2026-06-14
 
 == Mission en cours
 
-*Aucune.* EPIC V-1 prêt pour boot physique. Clé USB flashée avec
-correctifs GRUB (ext2/gfxterm modules). Reste uniquement le test
-boot sur machine réelle.
+EPIC 15 Network Boot & Remote Provisioning — ~25% done.
+- US-1 : `scripts/network-boot.sh` — dnsmasq proxy DHCP + TFTP + Python HTTP (kernel/initrd)
+- US-2 : `magic-stick.ipxe` généré auto — manque compilation iPXE + clé USB fallback
+- US-3 : `scripts/wake-laptops.sh` — WoL (etherwake + Python fallback)
+- US-5 : 4 tâches Gradle dans `build.gradle.kts`
+- US-4 : Hook chroot SSH — à implémenter
+- US-6 : Test QEMU + doc — à implémenter
 
 == Dernière action
 
-Session 080 — Fix GRUB Boot Prompt + Flash Physique :
-- Diagnostic : `core.img` sans module `ext2` → GRUB ne lit pas ext4 → prompt
-- Diagnostic : `grub.cfg` force sortie série → pas de menu graphique
-- `update-system.sh` : `--modules` Legacy (ext2, gfxterm, etc.) + UEFI
-  (ext2, fat, chain, efi_gop, efi_uga, etc.)
-- `grub.cfg` : `gfxterm` remplace `serial`, `---` en fin de ligne kernel
-- `verify` : `LANG=C parted`, exclut p1 des labels, vérifie taille core.img
-- `test-ab-partition.sh` : vérif taille core.img (>100 KB = modules OK)
-- `build.gradle.kts` : nouvelle tâche `isoSetupAB`, `isoFlash` → setup-ab,
-  `isoTestFull` inclut `isoTestAB`
-- Clé USB `/dev/sda` re-flashée : core.img 179 KB, grubx64.efi 2.3 MB,
-  verify passe sans erreur
+Session 081 — EPIC 15 Gradle tasks + scripts :
+- `build.gradle.kts` : `isoNetworkBoot`, `isoWakeLaptops`, `isoProvisionNetwork`, `isoNetworkTest`
+- `scripts/network-boot.sh` (5047 bytes, testé syntaxe OK)
+- `scripts/wake-laptops.sh` (2395 bytes, testé syntaxe OK)
+- BACKLOG/TODO/INDEX mis à jour, EPIC 15 à 25%
+- Commit + push : `c078a7f` (Gradle tasks) + session 081
 
-== A faire (Session 081)
+== A faire (Session 082)
 
-. Boot physique sur clé USB — Legacy BIOS et/ou UEFI
-. EPIC 7 — Site doc auto + IA release notes — 1%, BASSE
+. US-4 : Hook chroot SSH (`config/live-build/hooks/`) + autorisation clé
+. US-2 : Compilation iPXE + script embarqué (`build/undionly.kpxe`)
+. US-6 : Test QEMU 2 clients PXE + doc NETWORK_BOOT.adoc
+. Boot physique clé USB pour valider V-1
 
 == Rappels
 
 . ZERO commit/push sans permission
 . Remote : cccp-education/magic-stick
-. Clé USB : /dev/sda, 5 partitions, System A=v0.1.14, System B=vide, GRUB default=0
-. SourceForge : magic-stick_0.1.14.iso
-. Docker Hub : cccpeducation/magic-stick-cli:0.1.14
+. Clé USB : /dev/sda, 5 partitions, System A=v0.1.14, System B=vide
+. sudo password dans `mdp.txt` (`issa`)

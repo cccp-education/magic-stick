@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Magic Stick Welcome
-Exec=/usr/local/bin/magic-stick-welcome.sh
+Exec=bash -c '/usr/local/bin/magic-stick-headless-detect.sh || /usr/local/bin/magic-stick-welcome.sh'
 Icon=magic-stick
 Comment=First-run welcome dialog for Magic Stick
 OnlyShowIn=XFCE;

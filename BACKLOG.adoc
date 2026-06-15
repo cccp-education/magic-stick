@@ -92,7 +92,7 @@
 **Priorité** : BASSE
 * [ ] Heroic Games Launcher, Prism Launcher, RetroArch, Itch.io
 
-== EPIC 15 : Network Boot & Remote Provisioning 🔲 A FAIRE
+== EPIC 15 : Network Boot & Remote Provisioning 🔄 EN COURS
 
 **Priorité** : MOYENNE
 **Objectif** : Booter magic-stick en live sur des laptops Windows du réseau local
@@ -100,21 +100,21 @@ sans reformater, sans toucher leurs partitions, sans clé USB complète.
 Pilotage à distance depuis la machine hôte magic-stick.
 
 === US-1 : Proxy DHCP + TFTP/HTTP (dnsmasq)
-* [ ] Installer et configurer dnsmasq en proxy DHCP (ne casse pas le DHCP de la box)
-* [ ] `dhcp-range=proxy` + `dhcp-option=tag:pxeclient,option:bootfile-name`
-* [ ] Servir kernel + initrd via HTTP intégré à dnsmasq (plus rapide que TFTP)
+* [x] Installer et configurer dnsmasq en proxy DHCP (ne casse pas le DHCP de la box) — `scripts/network-boot.sh`
+* [x] `dhcp-range=proxy` + `dhcp-option=tag:pxeclient,option:bootfile-name` — config générée par le script
+* [x] Servir kernel + initrd via HTTP (Python http.server, plus rapide que TFTP) — `network-boot.sh` start_server
 * [ ] Hook chroot pour inclure dnsmasq dans l'ISO
 
 === US-2 : iPXE bootloader réseau
 * [ ] Compiler iPXE avec script embarqué (chaîne kernel+initrd HTTP + cmdline casper)
-* [ ] Servir iPXE via TFTP (dnsmasq `dhcp-boot=undionly.kpxe`)
+* [x] Servir iPXE via TFTP (dnsmasq `dhcp-boot=undionly.kpxe`) — script détecte ipxe-bootimgs ou build/undionly.kpxe
 * [ ] Fallback : mini clé USB (50 Mo) avec juste iPXE → chaîne vers HTTP réseau
-* [ ] Script iPXE : `kernel http://<host>/casper/vmlinuz`, `initrd`, `boot`
+* [x] Script iPXE : `kernel http://<host>/vmlinuz`, `initrd`, `boot` — `magic-stick.ipxe` généré automatiquement
 
 === US-3 : Wake-on-LAN
-* [ ] Script `wake-laptops.sh` — envoie magic packet aux MACs des laptops cibles
+* [x] Script `wake-laptops.sh` — envoie magic packet aux MACs des laptops cibles (etherwake + fallback Python)
 * [ ] Découverte MACs via scan ARP ou fichier config `laptops.conf`
-* [ ] Intégration dans la tâche Gradle `isoProvisionNetwork`
+* [x] Intégration dans la tâche Gradle `isoProvisionNetwork` — build.gradle.kts
 
 === US-4 : SSH dans l'ISO live
 * [ ] Hook chroot : installer openssh-server, générer clé hôte au boot
@@ -122,12 +122,48 @@ Pilotage à distance depuis la machine hôte magic-stick.
 * [ ] Option kernel `ssh.enabled=1` dans le script iPXE
 * [ ] Test : SSH depuis l'hôte vers le laptop booté en live
 
-=== US-5 : Tâche Gradle `isoProvisionNetwork`
-* [ ] Tâche `isoProvisionNetwork` : wake-laptops → attendre boot → vérifier SSH → provisionner
-* [ ] Paramètres : `-Plaptops=mac1,mac2,mac3` ou fichier config
+=== US-5 : Tâche Gradle `isoProvisionNetwork` — build.gradle.kts
+* [x] Tâche `isoProvisionNetwork` : dnsmasq → wake-laptops → attendre boot → vérifier SSH → provisionner
+* [x] Tâche `isoNetworkBoot` : démarre le serveur seul
+* [x] Tâche `isoWakeLaptops` : envoie WoL aux MACs spécifiées
+* [x] Tâche `isoNetworkTest` : placeholder QEMU test
+* [x] Paramètres : `-Plaptops=mac1,mac2,mac3 -Piface=eth0 -PhttpPort=8080`
 * [ ] Mode dry-run : affiche ce qui serait fait sans exécuter
 
 === US-6 : Test bout en bout
 * [ ] Test QEMU : simuler 2 clients PXE + 1 serveur dnsmasq
 * [ ] Test réel : 2 laptops Windows, boot réseau, SSH fonctionnel
 * [ ] Documentation : `NETWORK_BOOT.adoc` dans `docs/`
+
+== EPIC 16 : Virtual Appliance (VPS/QEMU/KVM) 🔄 EN COURS
+
+**Priorité** : HAUTE
+**Objectif** : Déployer magic-stick comme VM headless sur VPS/cloud
+(Proxmox, KVM/libvirt, QEMU brut). Accès SSH + console série,
+drivers virtio, image qcow2 prête à l'emploi.
+
+=== US-1 : Hook chroot virtual appliance
+* [x] Hook `055-virtual-appliance.chroot` : serial-getty@ttyS0, SSH host keys firstboot, virtio modules initramfs, headless detection script
+* [x] Package `openssh-server` ajouté à `live.list.chroot`
+* [x] `magic-stick-welcome.sh` patché pour mode headless (détection `virtual=true` cmdline + systemd-detect-virt + DISPLAY)
+* [x] `magic-stick-welcome.desktop` wrapper avec détection headless
+
+=== US-2 : GRUB headless serial entry
+* [x] Entrée GRUB "Headless (serial console)" dans `990-add-efi-support.binary` : `nomodeset console=ttyS0,115200 virtual=true`, terminal_input/output serial
+
+=== US-3 : ISOLINUX menu 4 modes BIOS
+* [x] Fichiers custom `includes.binary/isolinux/` : live.cfg (Live + nomodeset + safe mode), install.cfg (Install), menu.cfg, stdmenu.cfg, splash.png
+* [x] Menu ISOLINUX Legacy BIOS identique au GRUB UEFI (4 modes)
+
+=== US-4 : Script + Gradle task qcow2
+* [x] `scripts/virtual-appliance.sh` : qemu-img create qcow2 + boot ISO → disque virtuel
+* [x] Tâche Gradle `isoVirtualAppliance` : génère qcow2 depuis l'ISO dans Docker
+
+=== US-5 : Documentation
+* [x] `docs/VIRTUAL_APPLIANCE.adoc` : guide déploiement QEMU/KVM/Proxmox/VPS
+* [ ] Mettre à jour README pour mentionner le mode virtual appliance
+
+=== US-6 : Test bout en bout
+* [ ] Test QEMU headless : boot qcow2, vérifier SSH + serial-getty + virtio
+* [ ] Tâche Gradle `isoTestVirtual` : test automatisé du scénario VPS dans QEMU
+* [ ] Test réel : déploiement sur VPS (edster ou autre)

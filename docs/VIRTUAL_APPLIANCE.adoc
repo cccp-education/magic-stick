@@ -1,0 +1,108 @@
+= Magic Stick — Virtual Appliance
+:toc: macro
+:toclevels: 3
+
+// Generated 2026-06-14 — EPIC 16 Virtual Appliance
+
+toc::[]
+
+== Pourquoi un Virtual Appliance ?
+
+Magic Stick n'est pas qu'une clé USB physique. L'ISO peut être déployée
+comme machine virtuelle headless sur un VPS, un serveur Proxmox, ou
+n'importe quel hyperviseur KVM/QEMU.
+
+Cas d'usage :
+* Workspace de dev distant accessible via SSH
+* Serveur Ollama + Open WebUI headless
+* CI/CD runner éphémère
+* Environnement de formation provisionné à la demande
+
+== Pré-requis dans l'ISO
+
+L'ISO intègre depuis la version 0.1.15 :
+
+* **SSH server** : openssh-server installé, clés hôtes générées au first boot
+* **Serial console** : serial-getty@ttyS0 activé (console headless)
+* **Drivers virtio** : virtio_blk, virtio_net, virtio_pci, virtio_console, virtio_scsi dans l'initramfs
+* **Détection headless** : script `magic-stick-headless-detect.sh` (cmdline `virtual=true`, systemd-detect-virt, DISPLAY)
+* **Menu GRUB headless** : entrée "Headless (serial console)" avec `nomodeset console=ttyS0,115200 virtual=true`
+
+== Génération de l'image qcow2
+
+[source,shell]
+----
+# Builder l'ISO d'abord
+./gradlew isoBuild
+
+# Générer le qcow2 (10 Go par défaut)
+./gradlew isoVirtualAppliance
+----
+
+Le qcow2 est créé dans `build/magic-stick_<version>.qcow2`.
+
+== Déploiement QEMU brut (VPS)
+
+[source,shell]
+----
+qemu-system-x86_64 \
+  -m 4096 -smp 4 \
+  -drive file=magic-stick_0.1.15.qcow2,if=virtio,format=qcow2 \
+  -netdev user,id=net0,hostfwd=tcp::2222-:22 \
+  -device virtio-net,netdev=net0 \
+  -nographic
+----
+
+Puis SSH :
+[source,shell]
+----
+ssh -p 2222 magic@localhost
+# Password: magic
+----
+
+=== Options recommandées pour VPS
+
+* `-enable-kvm` : accélération matérielle (si disponible)
+* `-cpu host` : exposer les features CPU de l'hôte
+* `-daemonize` : détacher le processus
+* `-monitor telnet:127.0.0.1:4444,server,nowait` : console QEMU monitor
+
+== Déploiement Proxmox
+
+. Uploader le qcow2 sur le stockage Proxmox
+. Créer une VM avec :
+  * BIOS : OVMF (UEFI)
+  * Machine : q35
+  * Disque : importer le qcow2
+  * Réseau : VirtIO
+  * Display : serial terminal (pas de VGA)
+. Ajouter `virtual=true nomodeset console=ttyS0,115200` aux args kernel
+. Booter, accéder via la console série Proxmox ou SSH
+
+== Déploiement KVM/libvirt
+
+[source,shell]
+----
+virt-install \
+  --name magic-stick \
+  --memory 4096 --vcpus 4 \
+  --disk path=magic-stick_0.1.15.qcow2,format=qcow2,bus=virtio \
+  --network user,model=virtio \
+  --graphics none \
+  --serial pty \
+  --import \
+  --boot hd
+----
+
+== Accès
+
+* **SSH** : `ssh magic@<ip>` (mot de passe : `magic`)
+* **Console série** : `virsh console magic-stick` (libvirt) ou `-serial stdio` (QEMU)
+* **VNC** (si nécessaire) : ajouter `-vnc :0` au QEMU, le menu GRUB standard est disponible
+
+== Limitations
+
+* Pas de persistance entre rebuilds (qcow2 = snapshot de l'ISO)
+* Pas de cloud-init (configuration manuelle au premier boot)
+* Le mot de passe `magic` est hardcodé — changer après premier login
+* Pas de resize automatique du disque

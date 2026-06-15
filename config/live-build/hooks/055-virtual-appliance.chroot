@@ -1,0 +1,103 @@
+#!/bin/sh
+set -e
+
+echo "==> Virtual Appliance: headless + SSH + virtio configuration"
+
+echo "==> Enabling serial-getty on ttyS0 for headless console access"
+mkdir -p /etc/systemd/system/serial-getty@ttyS0.service.d
+cat > /etc/systemd/system/serial-getty@ttyS0.service.d/override.conf << 'EOF'
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --keep-baud 115200,57600,38400,9600 %I dumb
+EOF
+systemctl enable serial-getty@ttyS0.service 2>/dev/null || true
+
+echo "==> Enabling SSH server"
+systemctl enable ssh.service 2>/dev/null || true
+
+echo "==> Generating SSH host keys at first boot"
+cat > /etc/systemd/system/ssh-host-keys-firstboot.service << 'EOF'
+[Unit]
+Description=Generate SSH host keys on first boot
+ConditionPathExists=!/etc/ssh/ssh_host_rsa_key
+Before=ssh.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ssh-keygen -A
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+systemctl enable ssh-host-keys-firstboot.service 2>/dev/null || true
+
+echo "==> Adding virtio kernel modules to initramfs"
+mkdir -p /etc/initramfs-tools
+cat >> /etc/initramfs-tools/modules << 'EOF'
+# Virtual Appliance: virtio drivers for KVM/QEMU
+virtio_blk
+virtio_net
+virtio_pci
+virtio_console
+virtio_scsi
+EOF
+
+echo "==> Creating headless detection script"
+cat > /usr/local/bin/magic-stick-headless-detect.sh << 'DETECTEOF'
+#!/usr/bin/env bash
+if grep -q "virtual=true" /proc/cmdline 2>/dev/null; then
+    exit 0
+fi
+if command -v systemd-detect-virt >/dev/null 2>&1; then
+    VIRT=$(systemd-detect-virt 2>/dev/null || echo "none")
+    if [ "$VIRT" != "none" ]; then
+        exit 0
+    fi
+fi
+if [ -z "${DISPLAY:-}" ] && [ -z "${WAYLAND_DISPLAY:-}" ]; then
+    exit 0
+fi
+exit 1
+DETECTEOF
+chmod 755 /usr/local/bin/magic-stick-headless-detect.sh
+
+echo "==> Patching welcome script for headless compatibility"
+if [ -f /usr/local/bin/magic-stick-welcome.sh ]; then
+    cat > /usr/local/bin/magic-stick-welcome.sh << 'WELCOMEEOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+VERSION_FILE="/etc/magic-stick/version"
+VERSION="inconnue"
+if [[ -r "$VERSION_FILE" ]]; then
+    VERSION="$(head -n 1 "$VERSION_FILE" | tr -d '[:space:]')"
+fi
+
+if /usr/local/bin/magic-stick-headless-detect.sh; then
+    echo "Magic Stick ${VERSION} — Headless/Virtual Mode"
+    echo "SSH: ssh magic@<ip>  (password: magic)"
+    echo "Serial console: ttyS0 115200"
+    exit 0
+fi
+
+title="Bienvenue sur Magic Stick ${VERSION}"
+
+zenity --info \
+    --title="$title" \
+    --width=480 \
+    --icon-name=magic-stick \
+    --text="<b>Magic Stick ${VERSION}</b>\n\n\
+Environnement de developpement portable.\n\
+Tous les outils sont prets — terminal, IDE, containers, reseau.\n\n\
+Raccourcis:\n\
+<b>Super + T</b>  Terminal\n\
+<b>Super + F</b>  Fichiers\n\
+<b>Super + B</b>  Firefox\n\
+<b>Super + 1..4</b>  Bureaux\n\n\
+Documentation: <a href='https://cccp-education.github.io/magic-stick/'>https://cccp-education.github.io/magic-stick/</a>" || true
+WELCOMEEOF
+    chmod 755 /usr/local/bin/magic-stick-welcome.sh
+fi
+
+echo "==> Virtual Appliance configuration complete"

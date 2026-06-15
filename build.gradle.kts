@@ -418,6 +418,21 @@ tasks.register<org.gradle.api.tasks.Exec>("isoTestPersistence") {
         "/magic-stick/scripts/update-system.sh")
 }
 
+tasks.register<org.gradle.api.tasks.Exec>("isoVirtualAppliance") {
+    group = "iso"
+    description = "Generate qcow2 virtual appliance image from ISO for VPS/KVM deployment"
+    dependsOn("dockerBuild")
+    val isoFile = file("build/$isoName")
+    onlyIf { isoFile.exists() }
+    commandLine("docker", "run", "--rm", "--privileged",
+        "-v", "$projDir:/magic-stick",
+        dockerImage,
+        "/magic-stick/scripts/virtual-appliance.sh",
+        "/magic-stick/build/$isoName",
+        "/magic-stick/build/${isoName.replace(".iso", ".qcow2")}",
+        "10G")
+}
+
 tasks.register<org.gradle.api.tasks.Exec>("isoReleaseNotes") {
     group = "iso"
     description = "Generate AsciiDoc release notes from conventional commits." +
