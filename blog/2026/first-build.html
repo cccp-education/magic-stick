@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
+	<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Magic Stick</title>
+
+    <script>
+        (function() {
+          try {
+            const theme = localStorage.getItem('preferred-theme');
+            if (theme) {
+              document.documentElement.setAttribute('data-bs-theme', theme);
+            }
+          } catch (e) {
+            console.warn('Could not set theme from localStorage', e);
+          }
+        })();
+    </script>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css"/>
+
+    <link rel="stylesheet"
+          href="../../css/styles.css"/>
+
+    <link href="../../css/asciidoctor.css"
+          rel="stylesheet"/>
+
+    <link rel="shortcut icon"
+          href="../..//img/favicon.ico"/>
+
+    <meta name="description"
+          content="Magic Stick — environnement portable standardise sur cle USB bootable"/>
+    <meta name="keywords"
+          content="live USB, xubuntu, diagnostic, formation, portable"/>
+    <meta name="author" content="cccp.education"/>
+</head>
+	<body onload="prettyPrint()">
+	<div id="wrap" class="main-content-padding">
+		<div>
+            <nav class="navbar navbar-expand-lg fixed-top">
+                <div class="container">
+                    <a class="navbar-brand fw-bold" href="../../index.html#home">
+                        <i class="bi bi-usb-drive me-2"></i>
+                        <span class="brand-text">Magic Stick</span>
+                        
+                    </a>
+
+                    <button class="navbar-toggler"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#navbarNav"
+                            aria-controls="navbarNav"
+                            aria-expanded="false"
+                            aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-auto align-items-start">
+                            <li class="nav-item">
+                                <a class="nav-link" href="../../index.html#home">Accueil</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="../../index.html#features">Cas d'usage</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="../../index.html#architecture">Architecture</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="docsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Docs</a>
+                                <ul class="dropdown-menu" aria-labelledby="docsDropdown">
+                                    <li><a class="dropdown-item" href="../../flash-guide.html">Guide d'installation</a></li>
+                                    <li><a class="dropdown-item" href="../../quick-start.html">Demarrage rapide</a></li>
+                                    <li><a class="dropdown-item" href="../../ab-partition.html">Partition A/B</a></li>
+                                    <li><a class="dropdown-item" href="../../scripts.html">Scripts</a></li>
+                                    <li><hr class="dropdown-divider"/></li>
+                                    <li><a class="dropdown-item" href="../../releases.html">Notes de version</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="nav-item dropdown theme-switcher-container ms-lg-3">
+                            <button class="btn btn-outline-secondary dropdown-toggle theme-dropdown-btn"
+                                    type="button"
+                                    id="themeDropdown"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                    aria-label="Selectionner le theme de l'interface">
+                                <i class="bi bi-sun"></i>
+                                <span id="current-theme" class="visually-hidden">Light</span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="themeDropdown">
+                                <li><button class="dropdown-item theme-option" type="button" data-theme="light">
+                                    <i class="bi bi-sun me-2"></i>Light
+                                </button></li>
+                                <li><button class="dropdown-item theme-option" type="button" data-theme="dark">
+                                    <i class="bi bi-moon me-2"></i>Dark
+                                </button></li>
+                                <li><button class="dropdown-item theme-option" type="button" data-theme="high-contrast">
+                                    <i class="bi bi-circle-half me-2"></i>High Contrast
+                                </button></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+		<main class="container">
+			<div class="page-header">
+				<h1>Premier build ISO Xubuntu</h1>
+			</div>
+			<p><em>23 April 2026</em></p>
+			<p><div class="listingblock">
+<div class="title">Configuration de live-build</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">sudo apt install live-build debootstrap squashfs-tools xorriso
+lb config -a amd64 -d noble --package-lists xubuntu-desktop
+lb build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Le premier build est la cle de voute du projet. En utilisant <code>live-build</code>, on genere une ISO bootable Xubuntu minimaliste qui servira de base aux partitions A et B.</p>
+</div></p>
+			<hr />
+		</main>
+	</div>
+	<div>
+    <footer class="enhanced-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <h5 class="fw-bold">
+                        <i class="bi bi-usb-drive me-2"></i>
+                        Magic Stick
+                        
+                    </h5>
+                    <p class="footer-description">
+                        Environnement portable standardise sur cle USB bootable.
+                        Formation, diagnostic reseau, dev nomade.
+                    </p>
+                    <div class="social-icons">
+                        <a href="https://github.com/cccp-education/magic-stick" target="_blank" aria-label="GitHub"><i class="bi bi-github"></i></a>
+                        <a href="../../feed.xml" aria-label="Flux RSS"><i class="bi bi-rss"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                    <h6 class="fw-bold">Documentation</h6>
+                    <ul class="footer-links">
+                        <li><a href="../../flash-guide.html"><i class="bi bi-chevron-right"></i>Guide d'installation</a></li>
+                        <li><a href="../../quick-start.html"><i class="bi bi-chevron-right"></i>Demarrage rapide</a></li>
+                        <li><a href="../../ab-partition.html"><i class="bi bi-chevron-right"></i>Partition A/B</a></li>
+                        <li><a href="../../scripts.html"><i class="bi bi-chevron-right"></i>Scripts</a></li>
+                        <li><a href="../../releases.html"><i class="bi bi-chevron-right"></i>Notes de version</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                    <h6 class="fw-bold">Telecharger</h6>
+                    <ul class="footer-links">
+                        <li><a href="https://sourceforge.net/projects/magic-stick/files/" target="_blank"><i class="bi bi-download"></i>SourceForge</a></li>
+                        <li><a href="https://github.com/cccp-education/magic-stick" target="_blank"><i class="bi bi-github"></i>Code source</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="fw-bold">Developpeur</h6>
+                    <p class="mb-3">Projet developpe par cccp.education.</p>
+                    <ul class="footer-links">
+                        <li><a href="https://cccp.education" target="_blank"><i class="bi bi-globe"></i>cccp.education</a></li>
+                        <li><a href="https://github.com/cccp-education" target="_blank"><i class="bi bi-github"></i>GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <hr class="footer-divider"/>
+            <div class="footer-bottom">
+                <p>&copy; 2024-<span>2026</span> cccp.education. Tous droits reserves.</p>
+                <div class="footer-bottom-links">
+                    <a href="https://cccp.education" target="_blank">cccp.education</a>
+                    <a href="https://sourceforge.net/projects/magic-stick/" target="_blank">SourceForge</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <script src="../../js/script.js"></script>
+</div>
+	</body>
+</html>
