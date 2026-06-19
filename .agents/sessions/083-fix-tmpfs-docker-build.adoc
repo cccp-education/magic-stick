@@ -1,0 +1,18 @@
+= Session 083 — Fix Docker build — retrait tmpfs /tmp
+:date: 2026-06-19
+:type: fix
+:score: 9/10
+
+== Résumé
+
+Correction du Docker build ISO : retrait de l'option `--tmpfs /tmp:exec,mode=1777`
+dans `isoBuild` task. Cette option n'est pas supportée par tous les environnements
+Docker et peut causer des échecs de build.
+
+== Modifications
+
+- build.gradle.kts : suppression de `--tmpfs /tmp:exec,mode=1777` dans la commande docker run
+
+== Prochaine session
+
+084 — Rebuild ISO 0.1.15 + test VNC + EPIC 16 US-6

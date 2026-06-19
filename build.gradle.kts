@@ -79,7 +79,6 @@ tasks.register<org.gradle.api.tasks.Exec>("isoBuild") {
     dependsOn("dockerBuild")
     commandLine("bash", "-c",
         "docker run --rm --privileged " +
-        "--tmpfs /tmp:exec,mode=1777 " +
         "-v \"$projDir:/magic-stick\" " +
         "-e \"MAGIC_STICK_VERSION=$magicStickVersion\" " +
         "-e \"CLEAN=false\" " +

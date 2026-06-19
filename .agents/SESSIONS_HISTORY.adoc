@@ -4,6 +4,7 @@ _Derniere mise a jour_ : 2026-06-15 (session 082)
 
 |===
 | # | Date | Type | Sujet | Score
+| 083 | 19 juin 2026 | fix | Fix Docker build — retrait --tmpfs /tmp dans isoBuild task | 9/10
 | 082 | 15 juin 2026 | fix+governance | Fix Cache Downloads + tentative rebuild ISO 0.1.15 — DL_CACHE migré hors build/ → cache/downloads/, doublon open-infrastructure-system-config corrigé, patch live-config confirmé fonctionnel, build interrompu (disque saturé), nettoyage Gradle caches (~3.8GB). | 6/10
 | 081 | 14-15 juin 2026 | feat+fix+governance | EPIC 16 Virtual Appliance + ISOLINUX 4 modes BIOS — Hook 055 (serial-getty, SSH, virtio, headless), GRUB Headless serial entry, ISOLINUX custom menu 4 modes, virtual-appliance.sh + Gradle task, docs/VIRTUAL_APPLIANCE.adoc, fix build-inner.sh (live-config-sysvinit obsolète), bump 0.1.15. Build ISO échoue (live-config conflit, patch en place). | 7/10
 | 080 | 14 juin 2026 | fix+deploy | Fix GRUB Boot Prompt + Flash Physique — core.img sans ext2 → prompt GRUB, grub.cfg série → pas de menu. --modules Legacy+UEFI, gfxterm, verify taille core.img, isoSetupAB task, clé re-flashée. | 9/10
