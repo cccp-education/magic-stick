@@ -24,7 +24,48 @@
 . [ ] 4. Mise a jour `INDEX.adoc` — numero de session, roadmap, statut EPICs
 . [ ] 5. Mise a jour `COMPLETED_TASKS_ARCHIVE.adoc` — taches terminees
 . [ ] 6. Verification — `git status`, absence de secrets
+. [ ] 7. Synchronisation backlog — `BACKLOG.adoc` + `TODO.adoc` (voir detail ci-dessous)
+
 . [ ] 7. Rotation backup si N%10==0 ou EAGER > 500 lignes
+
+== Etape 7 — Synchronisation backlog (detail obligatoire)
+
+*Recurrentement mal appliquee* : la table de statut final est mise a jour
+mais les *sections detaillees* des EPICs gardent des marqueurs perimes
+(`🟡 a faire`, `⏳ A FAIRE`, `A PLANIFIER`, `EN PAUSE`) alors que l'INDEX
+marque `✅ TERMINE`. Faux positif qui fausse l'ouverture de session suivante.
+
+Portee de la synchronisation (a executer a CHAQUE cloture de session) :
+
+. *Table de statut final* — si une US/EPIC est termine cette session,
+  marquer `✅ TERMINE (S-NNN)` dans la table aggreee.
+. *Sections detaillees des EPICs* — pour CHAQUE US/EPIC termine cette
+  session, mettre a jour la colonne `Statut` dans le tableau detaille de
+  l'EPIC (pas seulement la table aggreee). Marqueurs a remplacer :
+  `🟡` → `✅`, `⏳ A FAIRE` → `✅ TERMINE (S-NNN)`, `A PLANIFIER` →
+  `✅ TERMINE` ou `✅ CADUQUE`, `EN PAUSE` → `✅ TERMINE`.
+. *En-tetes de section* — si l'EPIC est termine, remplacer `🟡 EPIC X
+  (Session NNN — Cadrage/EN PAUSE/a planifier)` par `✅ EPIC X (Session
+  NNN — TERMINE)`.
+. *Paragraphes de statut* — mettre a jour le paragraphe recapitulatif
+  sous la table de statut final (versions publiees, sessions de
+  reference, dependencies cloturees).
+. *TODO.adoc* (si present) — cocher les items termines `[ ]` → `[x]`,
+  ajouter les nouveaux items decouverts.
+
+Verification post-synchronisation (obligatoire avant de marquer l'etape 7 OK) :
+
+----
+grep -n "🟡\|⏳\|À FAIRE\|À PLANIFIER\|EN PAUSE\|à planifier\|à faire" BACKLOG.adoc
+----
+
+Si la commande retourne des matches pour des EPICs/US *deja termines*
+(selon l'INDEX), la synchronisation n'est *pas* terminee — corriger les
+marqueurs et re-verifier.
+
+*Note* : cette verification ne s'applique qu'aux EPICs/US *termines*. Un
+marqueur `🟡` pour un EPIC *reellement en cours* ou *a planifier* est
+legitime et ne doit pas etre supprime.
 
 == Commandes de Verification
 
