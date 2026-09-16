@@ -9,7 +9,7 @@
 
 == Pendant la session
 
-. [ ] Respecter la Regle 1 — AUCUN commit sans permission explicite
+. [ ] Respecter la Regle — Git autorisé (décision 2026-09-17), zéro secret commité
 . [ ] Respecter la Regle 2 — PAS de commande destructive (dd, mkfs, rm -rf hors build) sans permission
 . [ ] Respecter la Regle 3 — ZERO secret/token dans le terminal
 . [ ] Respecter la Regle 4 — backup avant modif fichier config non versionne

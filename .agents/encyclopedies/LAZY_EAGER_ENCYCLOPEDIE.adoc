@@ -57,9 +57,8 @@ Duree cible : 15-30 minutes.
 |Chaque session terminee est archivee avec resume et prochaines etapes.
 Rien ne se perd, tout se retrouve.
 
-|**Git manuel**
-|L'agent NE JAMAIS committer sans permission explicite.
-C'est l'utilisateur qui gere Git.
+|**Git**
+|Commit/push/merge autorisés (décision pilote 2026-09-17). Ne JAMAIS commiter de secret.
 
 |**Pas de commandes destructrices**
 |L'agent NE JAMAIS lancer `dd`, `mkfs`, `rm -rf` sans permission.
@@ -188,10 +187,10 @@ magic-stick/
 
 == Partie 3 — Regles Absolues
 
-=== 3.1 Commits/Git — INTERDICTION FORMELLE
+=== 3.1 Commits/Git — AUTORISÉ (décision pilote 2026-09-17)
 
-**L'agent NE DOIT JAMAIS** executer de commit, push, merge, ou toute commande git
-modifiant l'historique **SANS permission explicite de l'utilisateur**.
+**Commit/push/merge autorisés** (décision pilote 2026-09-17 — suppression de
+l'interdiction formelle). Ne JAMAIS commiter de secret.
 
 [cols="1,4", options="header"]
 |===

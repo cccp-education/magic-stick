@@ -33,7 +33,7 @@ Le build ISO 0.1.15 est prêt à être relancé.
 
 == Rappels
 
-. ZERO commit/push sans permission
+. Commit/push/merge autorisés (décision pilote 2026-09-17). Ne JAMAIS commiter de secret.
 . Remote : cccp-education/magic-stick
 . Clé USB : /dev/sda, 5 partitions, System A=v0.1.14, System B=vide
 . sudo password dans `mdp.txt` (`issa`)

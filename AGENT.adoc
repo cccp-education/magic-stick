@@ -50,9 +50,8 @@ _Role : INDEX.adoc = source verite roadmap/portefeuille. AGENT.adoc = regles + c
 
 === 1. Git — INTERDICTION FORMELLE
 
-Commits, push, merge interdits SANS permission explicite.
+* Commit/push/merge autorisés (décision pilote 2026-09-17). Ne JAMAIS commiter de secret.
 Autorise (lecture seule) : `git status`, `git diff`, `git log`, `git show`.
-Interdit (sauf ordre) : `git add`, `git commit`, `git push`, `git merge`, `git rebase`.
 
 === 2. Commandes destructrices
 
