@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Magic Stick</title>
+    <link href="https://cccp.education/magic-stick/" rel="alternate"/>
+    <link href="https://cccp.education/magic-stick/feed.xml" rel="self"/>
+    <id>https://cccp.education/magic-stick/</id>
+    <updated>2026-09-25</updated>
+    
+</feed>

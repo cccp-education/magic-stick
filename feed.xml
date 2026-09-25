@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Magic Stick</title>
+    <link href="https://cccp.education/magic-stick/" rel="alternate"/>
+    <link href="https://cccp.education/magic-stick/feed.xml" rel="self"/>
+    <id>https://cccp.education/magic-stick/</id>
+    <updated>2026-05-09</updated>
+    <entry>
+        <title>Foo Bar Baz Qux</title>
+        <link href="https://cccp.education/magic-stick/blog/2026/foo-bar-baz-qux.html.html" rel="alternate"/>
+        <id>https://cccp.education/magic-stick/blog/2026/foo-bar-baz-qux.html.html</id>
+        <updated>2026-05-09</updated>
+        <summary>Foo Bar Baz Qux</summary>
+    </entry><entry>
+        <title>Premier build ISO Xubuntu</title>
+        <link href="https://cccp.education/magic-stick/blog/2026/first-build.html.html" rel="alternate"/>
+        <id>https://cccp.education/magic-stick/blog/2026/first-build.html.html</id>
+        <updated>2026-04-23</updated>
+        <summary>Premier build ISO Xubuntu</summary>
+    </entry>
+</feed>
