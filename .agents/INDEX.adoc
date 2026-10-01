@@ -66,3 +66,4 @@ Projets gerant la meme methodologie opencode :
 | bakery-gradle | `~/workspace/foundry/public/bakery-gradle/bakery-plugin` | — | —
 | plantuml-gradle | `~/workspace/foundry/public/plantuml-gradle/plantuml-plugin` | — | —
 |===
+

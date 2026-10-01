@@ -19,3 +19,4 @@ _Derniere mise a jour_ : 2026-06-15 (session 082)
 | 071 | 23 mai 2026 | fix+ci | Fix CI/CD ISO Build — 7 fixes (python3.12, ripgrep, set +e). | 8/10
 | 070 | 22 mai 2026 | fix+ci/cd+backlog | EPIC V-1 : fixes CI/CD + checklist physique + flash merger. | 8/10
 |===
+
