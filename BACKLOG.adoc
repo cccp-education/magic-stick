@@ -1,5 +1,5 @@
 = Backlog — Magic Stick
-:last_update: 2026-06-15 (Session 082)
+:last_update: 2026-11-01 (audit accessibilité & bundle formation)
 
 '''
 **Objectif** : Suivi des issues et taches en cours
@@ -167,3 +167,67 @@ drivers virtio, image qcow2 prête à l'emploi.
 * [ ] Test QEMU headless : boot qcow2, vérifier SSH + serial-getty + virtio
 * [ ] Tâche Gradle `isoTestVirtual` : test automatisé du scénario VPS dans QEMU
 * [ ] Test réel : déploiement sur VPS (edster ou autre)
+
+== Observations — audit accessibilité & bundle formation (2026-11-01)
+
+_Constat mesuré sur disque._
+
+[cols="1,4,2", options="header"]
+|===
+| # | Constat | Recommandation
+
+| O-1
+| Les listes de paquets (`desktop.list.chroot`, `tools.list.chroot`, `live.list.chroot`) ne contiennent **ni Orca, ni BRLTTY, ni espeak** : le poste bootable n'est pas utilisable par une personne aveugle.
+| Ajouter la pile d'accessibilité dans une liste dédiée (`a11y.list.chroot`) et la valider au boot.
+
+| O-2
+| `A11yAudit` (axe-core, 6 pages × 3 thèmes) audite **le site de documentation**, pas le système live, ni Moodle, ni une formation.
+| Étendre la mesure : checklist d'accessibilité du poste (lecteur d'écran, Braille, clavier, contrastes) + audit du matériel chargé.
+
+| O-3
+| Les logiciels de la pile formation (Docker, Ollama, JDK) ne sont pas dans l'ISO ; `install-software.sh` est prévu pour être lancé **dans** le système live, pas pendant le build.
+| Créer un mode « formation » de l'ISO ou un bundle hors-ligne, avec modèles LLM et images préchargés.
+
+| O-4
+| `install-software.sh` installe JDK **21** alors que le workspace compile en **25**.
+| Aligner sur JDK 25 (cohérence avec les conventions de build).
+|===
+
+== EPIC 17 : Poste accessible (lecteur d'écran + Braille) 🔴 À FAIRE
+
+**Priorité** : HAUTE
+**Objectif** : rendre le poste bootable utilisable sans vision, sans installation et sans réseau.
+
+=== US-17-1 : Pile d'accessibilité préinstallée
+* [ ] `orca` (lecteur d'écran), `brltty` (Braille), `espeak-ng` (synthèse) dans `config/live-build/package-lists/a11y.list.chroot`
+* [ ] Profils de contraste élevé et taille de police dans le skel XFCE
+* [ ] `orca` lancé automatiquement en session live (autostart conditionnel)
+* [ ] Navigation clavier complète du menu et du terminal
+
+=== US-17-2 : Validation de l'accessibilité du poste
+* [ ] Script `scripts/test-a11y.sh` : vérifie la présence des paquets, le lancement d'Orca, le service BRLTTY
+* [ ] Tâche Gradle `isoTestA11y` (QEMU, vérification des processus)
+* [ ] Test manuel documenté avec une personne concernée (lecteur d'écran réel)
+
+=== US-17-3 : Documentation
+* [ ] `docs/ACCESSIBILITE.adoc` : limites connues, configuration Orca/BRLTTY, procédure de démarrage assistée
+
+== EPIC 18 : Mode formation hors-ligne 🔴 À FAIRE
+
+**Priorité** : HAUTE
+**Objectif** : une clé bootable qui contient la formation complète, utilisable sans réseau.
+
+=== US-18-1 : Préchargement de la pile
+* [ ] Images Moodle/PostgreSQL/Ollama/Portainer (`docker save`) intégrées au chroot ou au volume persistant
+* [ ] Modèles LLM légers préchargés (taille compatible avec la clé)
+* [ ] JDK 25 + plugins Gradle en cache local
+
+=== US-18-2 : Mode de démarrage formation
+* [ ] Profil de boot « formation » (services Moodle + workspace)
+* [ ] Vérification que le premier démarrage ne déclenche aucun téléchargement
+* [ ] Test QEMU réseau coupé
+
+=== US-18-3 : Matériel accessible embarqué
+* [ ] Supports HTML/EPUB accessibles (consommation `document`)
+* [ ] Vidéos sous-titrées + audiodécrites (consommation `capsule`)
+* [ ] Vérification de la lecture par Orca depuis la clé

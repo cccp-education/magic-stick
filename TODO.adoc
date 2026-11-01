@@ -1,5 +1,5 @@
 = TODO — Magic Stick
-:last_update: 2026-06-15 (Session 082)
+:last_update: 2026-11-01 (audit accessibilité & bundle formation)
 
 _Pense-bête informel. Pour les priorités, voir BACKLOG.adoc_
 
@@ -19,3 +19,5 @@ _Pense-bête informel. Pour les priorités, voir BACKLOG.adoc_
 * EPIC 16 US-6 : Test QEMU headless (boot qcow2, SSH + serial-getty + virtio)
 * EPIC 16 US-6 : Tâche Gradle isoTestVirtual
 * EPIC 16 US-5 : Mettre à jour README pour mode virtual appliance
+* EPIC 17 : Pile d'accessibilité (Orca, BRLTTY, espeak) + validation au boot
+* EPIC 18 : Mode formation hors-ligne (images + modèles + supports accessibles)
