@@ -80,10 +80,17 @@ jobs:
         run: ./gradlew isoTestAB
 
       - name: Mock test A/B + persistence (non-privileged CI/CD)
+        # MEM-CI-GATE-2.1 (S-339) — errexit: without it the two `bash -n` syntax
+        # checks could not fail the job (only the LAST command decides). The
+        # `gradle tasks` probe is redirected to a file: a `gradle … | grep -q`
+        # pipe would SIGPIPE gradle (141) and `pipefail` would fail a healthy run.
         run: |
+          set -euo pipefail
           bash -n scripts/test-ab-partition.sh
           bash -n scripts/update-system.sh
-          ./gradlew tasks --all | grep -q isoTestAB && echo "  task isoTestAB present"
+          ./gradlew tasks --all --console=plain > "$RUNNER_TEMP/tasks.txt"
+          grep -q isoTestAB "$RUNNER_TEMP/tasks.txt"
+          echo "  task isoTestAB present"
           bash scripts/test-persistence-mock.sh scripts/update-system.sh
 
       - name: Get version from VERSION file
