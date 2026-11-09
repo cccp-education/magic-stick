@@ -1,0 +1,33 @@
+= Session 084 — JitPack mirror (CNV-16)
+:toc: left
+:icons: font
+
+:session: 084
+:date: 2026-11-09
+:type: cross-borough / JitPack
+:statut: TERMINÉE
+
+== Contexte
+
+Dans le cadre de l'EPIC CNV-16 (canal secondaire JitPack), le borough
+`magic-stick` a été altéré : shim de résolution des conventions via JitPack
+et/ou publication de ses artefacts sur JitPack.
+
+== Changements
+
+* `settings.gradle.kts` (racine et/ou sous-build) : shim
+  `pluginManagement.resolutionStrategy.eachPlugin { useModule(...) }` pour
+  `education.cccp.build.*` vers le tag JitPack `0.0.15`.
+* Aucune publication JitPack (site/ISO, pas un artefact Maven) ; settings shim uniquement.
+* Aucun test local exécuté (Local = Build, Tests = CI).
+
+== Vérification
+
+* JitPack : n/a.
+* Canal canonique Central/Portal inchangé pour les projets privés.
+* Détail transversal :
+  `conventions-gradle/conventions-plugin/.agents/sessions/041-cnv-16-7-jitpack-publish-all.adoc`.
+
+== Suivant
+
+Veille ; aucune mission ouverte.

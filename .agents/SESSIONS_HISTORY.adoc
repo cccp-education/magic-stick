@@ -20,3 +20,9 @@ _Derniere mise a jour_ : 2026-06-15 (session 082)
 | 070 | 22 mai 2026 | fix+ci/cd+backlog | EPIC V-1 : fixes CI/CD + checklist physique + flash merger. | 8/10
 |===
 
+
+== Session 084 — JitPack mirror (CNV-16) — 2026-11-09
+
+Aucune publication JitPack (site/ISO, pas un artefact Maven) ; settings shim uniquement. JitPack : n/a. Shim `useModule` pour
+`education.cccp.build.*` (tag JitPack `0.0.15`). Rapport
+`.agents/sessions/084-jitpack-mirror.adoc`.

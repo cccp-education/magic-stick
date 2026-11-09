@@ -68,3 +68,7 @@ Projets gerant la meme methodologie opencode :
 | plantuml-gradle | `~/workspace/foundry/public/plantuml-gradle/plantuml-plugin` | — | —
 |===
 
+
+== Session 084 — JitPack mirror (CNV-16)
+
+Aucune publication JitPack (site/ISO, pas un artefact Maven) ; settings shim uniquement. JitPack : n/a.
