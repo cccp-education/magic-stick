@@ -16,5 +16,4 @@ pluginManagement.resolutionStrategy.eachPlugin {
     }
 }
 
-
 rootProject.name = "magic-stick"
