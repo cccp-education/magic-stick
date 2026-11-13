@@ -1,0 +1,9 @@
+= Archive des tâches terminées — Novembre 2026 (magic-stick)
+
+== S-086 — GBL-013 : exception d'image spécialisée ✅ (déclarée)
+
+* Le build ISO (live-build/QEMU, Docker-in-Docker, loop devices privilégiés)
+  reste sur `cccpeducation/magic-stick-cli`.
+* `magic-stick` n'est **pas déclaré portable** (cadrage GBL-013 §5 : extension,
+  pas concurrent). Aucun code/workflow modifié.
+* Rapport `.agents/sessions/086-gbl-013-exception-image.adoc`.

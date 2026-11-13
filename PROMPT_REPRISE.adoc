@@ -1,5 +1,12 @@
-= PROMPT REPRISE — magic-stick Session 085
+= PROMPT REPRISE — magic-stick Session 087
 :date: 2026-11-14
+
+== Session 086 — GBL-013 : exception d'image spécialisée
+
+Le build ISO (live-build/QEMU, Docker-in-Docker, loop devices privilégiés)
+reste sur l'image `cccpeducation/magic-stick-cli` ; `magic-stick` n'est pas
+déclaré portable (cadrage GBL-013 §5 : extension, pas concurrent). Aucun code
+modifié. Rapport `.agents/sessions/086-gbl-013-exception-image.adoc`.
 
 == Mission en cours
 

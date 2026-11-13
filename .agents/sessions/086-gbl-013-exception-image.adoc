@@ -1,0 +1,29 @@
+= Session 086 — GBL-013 : magic-stick déclaré hors gate portable (image spécialisée)
+:date: 2026-11-14
+:borough: Staten Island (magic-stick)
+
+== Constat
+
+`build.yml` construit une **image builder live-build/QEMU** (`docker/build-push-action`)
+puis exécute les tâches `isoBuild`/`isoVerify`/`isoTestBoot`/`isoTestSoftware`/
+`isoTestSmoke` sur l'hôte, en Docker-in-Docker, avec des loop devices privilégiés.
+L'image de base `cccp-ci-base` n'embarque ni démon Docker ni CLI, par décision
+(D6/D7) : Ollama, Docker et les modèles sont hors image.
+
+== Décision
+
+`magic-stick` reste sur son **image spécialisée** (`cccpeducation/magic-stick-cli`,
+live-build/QEMU), conformément au cadrage GBL-013 §5 (« extension de l'image de
+base, pas un concurrent »). Il **n'est pas déclaré portable** : P1/P3 ne peuvent
+pas être satisfaits sans un runner privilégié et une image d'extension dédiée.
+
+== Conséquence
+
+US-5 est à **15/16** ; `magic-stick` est une **exception déclarée** (image
+spécialisée). Aucun code, aucun workflow, aucune publication modifiés dans cette
+session. Une US future pourra extraire une image `cccp-ci-base` + live-build pour
+ce seul dépôt si le besoin d'un second runner apparaît.
+
+== Suivant
+
+US-5 se poursuit sur les autres vagues (déjà closes) ; US-6/US-7/US-9 ensuite.

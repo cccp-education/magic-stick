@@ -33,3 +33,13 @@ Aucune publication JitPack (site/ISO, pas un artefact Maven) ; settings shim uni
 `settings.gradle.kts` : shim `useModule` repointé sur le tag JitPack `0.0.17`
 (N0 `workspace-bom 0.0.136`). CI verte. Aucune publication Maven (site + ISO,
 hors canal JitPack). Rapport `.agents/sessions/085-cnv-17-jitpack-channel.adoc`.
+
+== Session 086 — GBL-013 : exception d'image spécialisée — 2026-11-14
+
+`build.yml` exige Docker-in-Docker + live-build/QEMU + loop devices
+privilégiés ; l'image de base `cccp-ci-base` n'embarque ni démon ni CLI Docker.
+Décision : `magic-stick` reste sur son image spécialisée
+(`cccpeducation/magic-stick-cli`) et **n'est pas déclaré portable** (cadrage
+GBL-013 §5 : extension, pas concurrent). Aucun code/workflow modifié. Rapport
+`.agents/sessions/086-gbl-013-exception-image.adoc`.
+
