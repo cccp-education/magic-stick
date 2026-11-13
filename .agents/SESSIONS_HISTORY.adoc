@@ -1,9 +1,10 @@
 = Historique des Sessions — Magic Stick
 
-_Derniere mise a jour_ : 2026-06-15 (session 082)
+_Derniere mise a jour_ : 2026-11-14 (session 085)
 
 |===
 | # | Date | Type | Sujet | Score
+| 085 | 14 nov. 2026 | publication | CNV-17 — JitPack canal unique (shim conventions `0.0.17`, site/ISO hors canal Maven) | 8/10
 | 083 | 19 juin 2026 | fix | Fix Docker build — retrait --tmpfs /tmp dans isoBuild task | 9/10
 | 082 | 15 juin 2026 | fix+governance | Fix Cache Downloads + tentative rebuild ISO 0.1.15 — DL_CACHE migré hors build/ → cache/downloads/, doublon open-infrastructure-system-config corrigé, patch live-config confirmé fonctionnel, build interrompu (disque saturé), nettoyage Gradle caches (~3.8GB). | 6/10
 | 081 | 14-15 juin 2026 | feat+fix+governance | EPIC 16 Virtual Appliance + ISOLINUX 4 modes BIOS — Hook 055 (serial-getty, SSH, virtio, headless), GRUB Headless serial entry, ISOLINUX custom menu 4 modes, virtual-appliance.sh + Gradle task, docs/VIRTUAL_APPLIANCE.adoc, fix build-inner.sh (live-config-sysvinit obsolète), bump 0.1.15. Build ISO échoue (live-config conflit, patch en place). | 7/10
@@ -26,3 +27,9 @@ _Derniere mise a jour_ : 2026-06-15 (session 082)
 Aucune publication JitPack (site/ISO, pas un artefact Maven) ; settings shim uniquement. JitPack : n/a. Shim `useModule` pour
 `education.cccp.build.*` (tag JitPack `0.0.15`). Rapport
 `.agents/sessions/084-jitpack-mirror.adoc`.
+
+== Session 085 — CNV-17 : JitPack canal unique — 2026-11-14
+
+`settings.gradle.kts` : shim `useModule` repointé sur le tag JitPack `0.0.17`
+(N0 `workspace-bom 0.0.136`). CI verte. Aucune publication Maven (site + ISO,
+hors canal JitPack). Rapport `.agents/sessions/085-cnv-17-jitpack-channel.adoc`.

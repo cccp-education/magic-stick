@@ -1,5 +1,5 @@
 = Backlog — Magic Stick
-:last_update: 2026-11-01 (audit accessibilité & bundle formation)
+:last_update: 2026-11-14 (session 085 — CNV-17 JitPack canal unique)
 
 '''
 **Objectif** : Suivi des issues et taches en cours
@@ -231,3 +231,9 @@ _Constat mesuré sur disque._
 * [ ] Supports HTML/EPUB accessibles (consommation `document`)
 * [ ] Vidéos sous-titrées + audiodécrites (consommation `capsule`)
 * [ ] Vérification de la lecture par Orca depuis la clé
+
+== Session 085 — CNV-17 (JitPack canal unique)
+
+Shim conventions `0.0.17` (N0 `workspace-bom 0.0.136`) ; CI verte. Aucune
+publication Maven (site + ISO, hors canal JitPack). Rapport
+`.agents/sessions/085-cnv-17-jitpack-channel.adoc`.

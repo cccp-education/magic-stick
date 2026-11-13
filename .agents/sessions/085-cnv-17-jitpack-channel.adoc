@@ -1,0 +1,50 @@
+= Session 085 — CNV-17 : JitPack canal unique (magic-stick)
+:toc: left
+:icons: font
+
+:session: 085
+:date: 2026-11-14
+:type: cross-borough / publication JitPack
+:statut: TERMINÉE
+
+== Contexte
+
+Décision pilote S-045 (2026-11-13) : JitPack devient le **canal unique** des
+artefacts publics `education.cccp`. Maven Central (nmcp) et le Gradle Plugin
+Portal cessent d'être publiés pour `foundry/public/**` ; un artefact = un canal
+= un nom = une version. `foundry/private/**` et `office/**` restent inchangés.
+Cadrage : `conventions-gradle/conventions-plugin/.agents/CADRAGE_EPIC_CNV_17_JITPACK_PRIMARY.adoc`.
+
+== Changements
+
+* `settings.gradle.kts` : shim des conventions (`education.cccp.build.*`)
+  repointé sur le tag JitPack `0.0.17`
+  (`useModule("com.github.cccp-education.conventions-gradle:conventions-plugin:0.0.17")`).
+* N0 amont : `workspace-bom 0.0.136` + `conventions-plugin 0.0.17`.
+* Aucune autre modification : le borough produit un site et une ISO, pas un
+  artefact Maven. Aucun test local (Local = Build, Tests = CI).
+
+== Preuves
+
+|===
+| Élément | Statut
+| CI du dépôt | ✅ verte (session S-045)
+| Publication Maven | n/a (site + ISO, hors canal JitPack)
+| Shim conventions `0.0.17` | ✅ aligné sur le canal JitPack
+| Double canal `education.cccp:*` | ✅ aucun
+|===
+
+== Fichiers touchés
+
+* `settings.gradle.kts` — tag JitPack `0.0.17`.
+* Gouvernance : `.agents/sessions/085-cnv-17-jitpack-channel.adoc`,
+  `.agents/SESSIONS_HISTORY.adoc`, `.agents/INDEX.adoc`,
+  `PROMPT_REPRISE.adoc`, `BACKLOG.adoc`.
+
+== Points d'attention et suite
+
+* Le borough reste hors canal de publication (site statique + image ISO) ; la
+  migration CNV-17 ne concerne que la résolution des conventions de build.
+  Aucune dette de coordonnées ouverte.
+* **Suite** — maintenance du site, aucune mission de contenu ouverte ; EPIC 16
+  et V-1 (virtual appliance, validation physique) hors périmètre CNV-17.

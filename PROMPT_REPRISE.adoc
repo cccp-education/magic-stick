@@ -1,30 +1,30 @@
-= PROMPT REPRISE — magic-stick Session 083
-:date: 2026-06-15
+= PROMPT REPRISE — magic-stick Session 085
+:date: 2026-11-14
 
 == Mission en cours
 
-EPIC 16 Virtual Appliance (VPS/QEMU/KVM) — 60% done (US-1→5 faits, US-6 restant).
-+ ISOLINUX 4 modes BIOS — fichiers créés, à vérifier au rebuild.
+Maintenance (aucune mission de contenu ouverte).
+EPIC 16 Virtual Appliance — 60% (US-1→5 faits, US-6 test restant).
+EPIC V-1 Validation Physique — 98% (boot hardware restant).
 
 == Dernière action
 
-Session 082 — Fix Cache Downloads + tentative rebuild ISO 0.1.15 :
-- Fix cache downloads : `DL_CACHE` migré hors `build/` → `cache/downloads/` (persiste entre cycles Gradle)
-- Fix doublon `open-infrastructure-system-config` dans `live.list.chroot`
-- Patch live-config **confirmé fonctionnel** : hooks passent, conflit résolu
-- Build ISO interrompu : disque saturé (chroot 12GB + cache 2.6GB > 21GB libres)
-- Nettoyage Gradle caches anciens (~3.8GB) → 25GB libres
-- `~/.local/share/opencode/` (4.9GB) préservé — données de session précieuses
+Session 085 — **CNV-17 : JitPack canal unique** (décision pilote S-045).
+- `settings.gradle.kts` : shim conventions repointé `0.0.17`
+  (`com.github.cccp-education.conventions-gradle:conventions-plugin`).
+- N0 amont : `workspace-bom 0.0.136`.
+- CI verte ; aucune publication Maven (site + ISO, hors canal JitPack).
+- Rapport `.agents/sessions/085-cnv-17-jitpack-channel.adoc`.
 
 == Bloqueur actif
 
-*Aucun.* Patch live-config fonctionnel. Espace disque suffisant (25GB).
-Le build ISO 0.1.15 est prêt à être relancé.
+*Aucun.* Le borough n'est pas concerné par la publication d'artefacts publics ;
+seule la résolution des conventions de build a changé.
 
-== A faire (Session 083)
+== A faire (Session 086)
 
 . Rebuild ISO 0.1.15 → `./gradlew isoBuild` (timeout 120 min, ~30GB requis)
-. Tester VNC : vérifier 4 modes ISOLINUX BIOS + entrée GRUB Headless serial
+. Tester VNC : 4 modes ISOLINUX BIOS + entrée GRUB Headless serial
 . EPIC 16 US-6 : Test QEMU headless (boot qcow2, SSH + serial-getty + virtio)
 . EPIC 16 US-6 : Tâche Gradle isoTestVirtual
 . Publier ISO 0.1.15 sur SourceForge
@@ -40,3 +40,4 @@ Le build ISO 0.1.15 est prêt à être relancé.
 . Build ISO : 30-60 min, lancer avec timeout long
 . Cache downloads : `cache/downloads/` (hors build/, persiste entre cycles)
 . Espace disque minimum pour build : ~30GB
+. Local = Build, Tests = CI

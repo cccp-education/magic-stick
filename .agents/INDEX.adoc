@@ -4,10 +4,11 @@ _Regles absolues_ : voir `AGENT.adoc`
 _Procedures_ : voir `LAZY_EAGER_ESSENTIALS.adoc`
 _Stockage backup_ : voir `.agents/GOVERNANCE_REFERENCE.adoc`
 
+_Derniere mise a jour_ : 2026-11-14 (session 085 — **CNV-17 JitPack canal unique** : shim conventions `0.0.17` ; site/ISO hors canal Maven ; CI verte)
 _Derniere mise a jour_ : 2026-10-31 (maintenance — **bakery 0.0.10 → 0.0.30**) : le site applique le plugin bakery et était 20 releases en retard ; il consomme désormais le head localisé (BKY-OUT-1), le RTL réel (BKY-OUT-2) et le catalogue N0 `PreserveRule`. `compileKotlin` vert contre l'artefact publié, CI `Test` verte. Aucune session de contenu ouverte (chore).
 _Derniere mise a jour (anterieure)_ : 2026-06-19 (session 083 — Fix Docker build — retrait tmpfs /tmp)
-_Session terminee_ : 083 — Fix Docker build — retrait tmpfs /tmp
-_Session en cours_ : 084 — Rebuild ISO 0.1.15 + test VNC + EPIC 16 US-6
+_Session terminee_ : 085 — CNV-17 JitPack canal unique (shim conventions `0.0.17`, site/ISO hors canal Maven)
+_Session en cours_ : 086 — Rebuild ISO 0.1.15 + test VNC + EPIC 16 US-6
 
 '''
 
@@ -15,6 +16,7 @@ _Session en cours_ : 084 — Rebuild ISO 0.1.15 + test VNC + EPIC 16 US-6
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
+| 085 | 14 nov. 2026 | publication | CNV-17 — JitPack canal unique (shim conventions `0.0.17`, site/ISO hors canal Maven) | `085-cnv-17-jitpack-channel.adoc` | 8/10
 | 083 | 19 juin 2026 | fix | Fix Docker build — retrait --tmpfs /tmp dans isoBuild task | `083-fix-tmpfs-docker-build.adoc` | 9/10
 | 082 | 15 juin 2026 | fix+governance | Fix Cache Downloads + tentative rebuild ISO 0.1.15 — DL_CACHE migré hors build/ → cache/downloads/, doublon open-infrastructure-system-config corrigé, patch live-config confirmé fonctionnel, build interrompu (disque saturé), nettoyage Gradle caches (~3.8GB). | `082-fix-cache-build.adoc` | 6/10
 | 080 | 14 juin 2026 | fix+deploy | Fix GRUB Boot Prompt + Flash Physique — core.img sans ext2 → prompt GRUB, grub.cfg série → pas de menu. --modules Legacy+UEFI, gfxterm, verify taille core.img, isoSetupAB task, clé re-flashée. | `080-fix-grub-boot-prompt.adoc` | 9/10
@@ -72,3 +74,9 @@ Projets gerant la meme methodologie opencode :
 == Session 084 — JitPack mirror (CNV-16)
 
 Aucune publication JitPack (site/ISO, pas un artefact Maven) ; settings shim uniquement. JitPack : n/a.
+
+== Session 085 — CNV-17 : JitPack canal unique
+
+Shim conventions repointé `0.0.17` (N0 `workspace-bom 0.0.136`) ; CI verte.
+Aucune publication Maven (site + ISO, hors canal JitPack). Rapport
+`.agents/sessions/085-cnv-17-jitpack-channel.adoc`.
