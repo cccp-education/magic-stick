@@ -7,3 +7,12 @@
 * `magic-stick` n'est **pas déclaré portable** (cadrage GBL-013 §5 : extension,
   pas concurrent). Aucun code/workflow modifié.
 * Rapport `.agents/sessions/086-gbl-013-exception-image.adoc`.
+
+== S-087 — GBL-013-10 : actions `node24`-natives et Node 26 LTS ✅
+
+* `build.yml` : `checkout@v7`, `setup-java@v6`, `setup-gradle@v6`, `cache@v6`,
+  `upload-artifact@v7` ; `release.yml` : `checkout@v7`.
+* Aucun `setup-node` (build shell/Docker) ; aucune image `cccp-ci-base`
+  (image spécialisée, S-086).
+* CI « Build ISO » **verte** — run `43683441850` (commit `6c47ddd`).
+* Rapport `.agents/sessions/087-gbl-013-10-node26-actions.adoc`.

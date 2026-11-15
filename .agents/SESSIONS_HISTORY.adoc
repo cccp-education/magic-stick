@@ -4,6 +4,7 @@ _Derniere mise a jour_ : 2026-11-14 (session 085)
 
 |===
 | # | Date | Type | Sujet | Score
+| 087 | 15 nov. 2026 | ci | GBL-013-10 — actions `node24`-natives et Node 26 LTS (checkout v7, setup-java v6, setup-gradle v6, cache v6, upload-artifact v7) ; Build ISO verte `43683441850` | 8/10
 | 085 | 14 nov. 2026 | publication | CNV-17 — JitPack canal unique (shim conventions `0.0.17`, site/ISO hors canal Maven) | 8/10
 | 083 | 19 juin 2026 | fix | Fix Docker build — retrait --tmpfs /tmp dans isoBuild task | 9/10
 | 082 | 15 juin 2026 | fix+governance | Fix Cache Downloads + tentative rebuild ISO 0.1.15 — DL_CACHE migré hors build/ → cache/downloads/, doublon open-infrastructure-system-config corrigé, patch live-config confirmé fonctionnel, build interrompu (disque saturé), nettoyage Gradle caches (~3.8GB). | 6/10
@@ -42,4 +43,12 @@ Décision : `magic-stick` reste sur son image spécialisée
 (`cccpeducation/magic-stick-cli`) et **n'est pas déclaré portable** (cadrage
 GBL-013 §5 : extension, pas concurrent). Aucun code/workflow modifié. Rapport
 `.agents/sessions/086-gbl-013-exception-image.adoc`.
+
+== Session 087 — GBL-013-10 : actions `node24`-natives et Node 26 LTS — 2026-11-15
+
+`build.yml` : `checkout@v4→v7`, `setup-java@v4→v6`, `setup-gradle@v4→v6`,
+`cache@v3→v6`, `upload-artifact@v4→v7` ; `release.yml` : `checkout@v4→v7`.
+Aucun `setup-node` (build shell/Docker), aucune image `cccp-ci-base` (exception
+d'image spécialisée S-086). CI « Build ISO » **verte** — run `43683441850`.
+Rapport `.agents/sessions/087-gbl-013-10-node26-actions.adoc`.
 

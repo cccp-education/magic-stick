@@ -1,0 +1,59 @@
+= Session 087 — GBL-013-10 : actions `node24`-natives et Node 26 LTS
+:toc: left
+:icons: font
+
+:session: 087
+:date: 2026-11-15
+:type: cross-borough / CI (GBL-013-10)
+:statut: TERMINÉE
+
+== Contexte
+
+Session globale 229 (2026-11-15). GBL-013-10 solde les avertissements
+« Node.js 20 is deprecated » des runners GitHub Actions en migrant les actions
+vers les majeures `node24`-natives, et aligne la version de Node sur la dernière
+LTS (`26.13.1`). `magic-stick` est concerné pour les **actions** ; il **n'a pas
+d'image CI `cccp-ci-base`** (session 086 : exception d'image spécialisée).
+
+== Changements (état mesuré)
+
+Commit `6c47ddd` (`ci: run on the latest Node LTS (node 26) and node24-native actions`) :
+
+* `.github/workflows/build.yml` —
+  `actions/checkout@v4` → `@v7`,
+  `actions/setup-java@v4` → `@v6`,
+  `gradle/actions/setup-gradle@v4` → `@v6`,
+  `actions/cache@v3` → `@v6`,
+  `actions/upload-artifact@v4` → `@v7`.
+* `.github/workflows/release.yml` — `actions/checkout@v4` → `@v7`.
+* Aucun bloc `setup-node` dans les workflows : rien à aligner côté
+  `node-version` (le build ISO est un build shell/Docker, pas Node).
+* Aucune image de conteneur : le job tourne sur `ubuntu-latest` et construit sa
+  propre image builder (`cccpeducation/magic-stick-cli`) — le digest
+  `cccp-ci-base` `sha256:03ead378…` ne s'applique pas ici.
+* Aucun code de production, aucun test, aucune publication.
+
+== Preuves
+
+|===
+| Élément | Statut
+| `git log` du 2026-11-15 | `6c47ddd` (1 commit, working tree propre)
+| Diff | 2 workflows (+7/−7)
+| CI « Build ISO » | ✅ **success** — run `43683441850` (commit `6c47ddd`)
+| Actions `node24`-natives | ✅ checkout v7, setup-java v6, setup-gradle v6, cache v6, upload-artifact v7
+| Image `cccp-ci-base` | n/a (image spécialisée, S-086)
+| Secret | ✅ aucun
+|===
+
+== Fichiers touchés (documentation uniquement)
+
+`.agents/sessions/087-gbl-013-10-node26-actions.adoc`,
+`.agents/SESSIONS_HISTORY.adoc`, `.agents/INDEX.adoc`,
+`.agents/archives/COMPLETED_TASKS_ARCHIVE_2026-11.adoc`, `BACKLOG.adoc`,
+`PROMPT_REPRISE.adoc`.
+
+== Suite
+
+Aucune mission de contenu ouverte : maintenance. Restent EPIC 16 US-6 (test QEMU
+headless) et EPIC V-1 (boot physique). Aucun test local, aucune publication,
+aucun secret.

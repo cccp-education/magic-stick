@@ -1,12 +1,16 @@
-= PROMPT REPRISE — magic-stick Session 087
-:date: 2026-11-14
+= PROMPT REPRISE — magic-stick Session 088
+:session: 088
+:date: 2026-11-15
+:etat: EN ATTENTE
 
-== Session 086 — GBL-013 : exception d'image spécialisée
+== Session 087 — GBL-013-10 : actions `node24`-natives et Node 26 LTS
 
-Le build ISO (live-build/QEMU, Docker-in-Docker, loop devices privilégiés)
-reste sur l'image `cccpeducation/magic-stick-cli` ; `magic-stick` n'est pas
-déclaré portable (cadrage GBL-013 §5 : extension, pas concurrent). Aucun code
-modifié. Rapport `.agents/sessions/086-gbl-013-exception-image.adoc`.
+`build.yml` migré vers `actions/checkout@v7`, `actions/setup-java@v6`,
+`gradle/actions/setup-gradle@v6`, `actions/cache@v6`,
+`actions/upload-artifact@v7` ; `release.yml` vers `checkout@v7`. Aucun
+`setup-node` (build shell/Docker) ; image spécialisée conservée (S-086). CI
+« Build ISO » **verte** — run `43683441850` (commit `6c47ddd`). Rapport
+`.agents/sessions/087-gbl-013-10-node26-actions.adoc`.
 
 == Mission en cours
 
@@ -14,21 +18,11 @@ Maintenance (aucune mission de contenu ouverte).
 EPIC 16 Virtual Appliance — 60% (US-1→5 faits, US-6 test restant).
 EPIC V-1 Validation Physique — 98% (boot hardware restant).
 
-== Dernière action
-
-Session 085 — **CNV-17 : JitPack canal unique** (décision pilote S-045).
-- `settings.gradle.kts` : shim conventions repointé `0.0.17`
-  (`com.github.cccp-education.conventions-gradle:conventions-plugin`).
-- N0 amont : `workspace-bom 0.0.136`.
-- CI verte ; aucune publication Maven (site + ISO, hors canal JitPack).
-- Rapport `.agents/sessions/085-cnv-17-jitpack-channel.adoc`.
-
 == Bloqueur actif
 
-*Aucun.* Le borough n'est pas concerné par la publication d'artefacts publics ;
-seule la résolution des conventions de build a changé.
+*Aucun.*
 
-== A faire (Session 086)
+== A faire (Session 088)
 
 . Rebuild ISO 0.1.15 → `./gradlew isoBuild` (timeout 120 min, ~30GB requis)
 . Tester VNC : 4 modes ISOLINUX BIOS + entrée GRUB Headless serial
