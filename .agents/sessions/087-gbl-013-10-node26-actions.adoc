@@ -57,3 +57,14 @@ Commit `6c47ddd` (`ci: run on the latest Node LTS (node 26) and node24-native ac
 Aucune mission de contenu ouverte : maintenance. Restent EPIC 16 US-6 (test QEMU
 headless) et EPIC V-1 (boot physique). Aucun test local, aucune publication,
 aucun secret.
+
+== Suivi — audit des logs CI et actions Docker (2026-11-15)
+
+L'audit du journal `Build ISO` (`43693733951`) a révélé la dernière alerte
+« Node.js 20 is deprecated » du workspace : `docker/build-push-action@v5`,
+`docker/login-action@v3`, `docker/setup-buildx-action@v3`,
+`docker/setup-qemu-action@v3`. Bump vers les majeures `node24`-natives
+(`build-push-action@v7`, `login-action@v4`, `setup-buildx-action@v4`,
+`setup-qemu-action@v4`), commit `ee2ed31`. Run `Build ISO` `44197533337` ✅
+(≈28 min) : **0 alerte Node 20** ; seules subsistent les bannières Gradle
+(MEM-WARN-ZERO) et un paquet Ubuntu nommé `python3-deprecated` (sans rapport).
