@@ -68,3 +68,24 @@ L'audit du journal `Build ISO` (`43693733951`) a révélé la dernière alerte
 `setup-qemu-action@v4`), commit `ee2ed31`. Run `Build ISO` `44197533337` ✅
 (≈28 min) : **0 alerte Node 20** ; seules subsistent les bannières Gradle
 (MEM-WARN-ZERO) et un paquet Ubuntu nommé `python3-deprecated` (sans rapport).
+
+== Suivi — build ISO derrière un flag explicite (2026-11-15)
+
+Le build ISO (~28 min) se déclenchait à **chaque** push (y compris docs). Il est
+désormais conditionné par un **flag** (commit `f394332`,
+`.github/workflows/build.yml`) :
+
+* **tag `vX.Y.Z`** → build automatique (chemin de release : checksum,
+  publication SourceForge) ;
+* **`workflow_dispatch`** → uniquement avec `build_iso: true` (défaut `false`) ;
+* **`workflow_call`** → `build_iso` (défaut `true` : l'appelant explicite) ;
+* **push sur `main`** → uniquement si la variable de dépôt
+  `MAGIC_STICK_BUILD_ISO = true` **ou** si le message de commit contient le
+  marqueur `[build-iso]` ;
+* **pull request** → jamais.
+
+La variable de dépôt `MAGIC_STICK_BUILD_ISO=false` a été créée
+(`gh variable set`). Vérification : le run du commit de clôture affiche le job
+`build` en **skipped** (aucune alerte, run vert). Le run `44217499547` a été
+**annulé** : son message de commit citait le marqueur littéral, ce qui a
+(démonstration involontaire) prouvé que la détection fonctionne.
