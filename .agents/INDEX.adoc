@@ -4,7 +4,7 @@ _Regles absolues_ : voir `AGENT.adoc`
 _Procedures_ : voir `LAZY_EAGER_ESSENTIALS.adoc`
 _Stockage backup_ : voir `.agents/GOVERNANCE_REFERENCE.adoc`
 
-_Derniere mise a jour : 2026-11-15 — Session 087 — GBL-013-10 : actions `node24`-natives (`checkout@v7`, `setup-java@v6`, `setup-gradle@v6`, `cache@v6`, `upload-artifact@v7`) ; CI « Build ISO » verte (`43683441850`)_
+_Derniere mise a jour : 2026-11-15 — Session 087 — GBL-013-10 : actions `node24`-natives (`checkout@v7`, `setup-java@v6`, `setup-gradle@v6`, `cache@v6`, `upload-artifact@v7`) ; CI « Build ISO » verte (`43683441850`) ; actions Docker `build-push@v7`/`login@v4`/`setup-buildx@v4`/`setup-qemu@v4` (`ee2ed31`, `Build ISO` `44197533337` ✅) — **0 alerte Node 20** dans les journaux audits._
 _Derniere mise a jour_ : 2026-11-14 (session 086 — **GBL-013 : exception d'image spécialisée** — le build ISO live-build/QEMU reste sur `cccpeducation/magic-stick-cli` ; non déclaré portable, cadrage §5)
 _Derniere mise a jour_ : 2026-11-14 (session 085 — **CNV-17 JitPack canal unique** : shim conventions `0.0.17` ; site/ISO hors canal Maven ; CI verte)
 _Derniere mise a jour_ : 2026-10-31 (maintenance — **bakery 0.0.10 → 0.0.30**) : le site applique le plugin bakery et était 20 releases en retard ; il consomme désormais le head localisé (BKY-OUT-1), le RTL réel (BKY-OUT-2) et le catalogue N0 `PreserveRule`. `compileKotlin` vert contre l'artefact publié, CI `Test` verte. Aucune session de contenu ouverte (chore).

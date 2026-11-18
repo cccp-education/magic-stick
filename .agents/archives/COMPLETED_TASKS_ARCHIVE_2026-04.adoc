@@ -228,3 +228,9 @@ Suite session 045 (fix Dockerfile EPIC 8 + bump v0.1.11, Docker Hub vert, ISO EN
 * EPIC 5 XFCE polishment
 
 ''',
+
+== S-087 (suite) — actions Docker sur majeures node24 ✅ (2026-11-15)
+
+* `docker/build-push-action@v7`, `login-action@v4`, `setup-buildx-action@v4`,
+  `setup-qemu-action@v4` (commit `ee2ed31`).
+* `Build ISO` `44197533337` ✅ (≈28 min) — **0 alerte « Node.js 20 »**.
