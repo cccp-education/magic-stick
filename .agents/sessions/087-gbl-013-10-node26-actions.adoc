@@ -89,3 +89,9 @@ La variable de dépôt `MAGIC_STICK_BUILD_ISO=false` a été créée
 `build` en **skipped** (aucune alerte, run vert). Le run `44217499547` a été
 **annulé** : son message de commit citait le marqueur littéral, ce qui a
 (démonstration involontaire) prouvé que la détection fonctionne.
+
+**Preuves des deux branches** : push sans flag → run `44217719724`, jobs
+`build` et `docker-hub` **skipped** ; `workflow_dispatch` avec
+`build_iso: true` → run `44217873612`, job `build` **in_progress** (annulé
+ensuite volontairement pour ne pas consommer 28 min de runner). Le chemin
+release reste automatique via `startsWith(github.ref, 'refs/tags/v')`.
