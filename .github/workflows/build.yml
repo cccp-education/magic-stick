@@ -1,5 +1,15 @@
 name: Build ISO
 
+# GBL-013-10 — the ISO build is expensive (~28 min). It is NEVER triggered by a
+# plain push: it requires an explicit flag (see the `if` of the `build` job).
+#   * release tag `vX.Y.Z`  → always builds (release path: checksum, SourceForge);
+#   * workflow_dispatch     → only with `build_iso: true`;
+#   * workflow_call         → only with `build_iso: true` (default true: an
+#                             explicit caller is an intent);
+#   * push on `main`        → only with the `[build-iso]` marker in the commit
+#                             message, or the repository variable
+#                             `MAGIC_STICK_BUILD_ISO = true`.
+# Other pushes and pull requests skip the job (the run stays green).
 on:
   push:
     branches: [main]
@@ -7,13 +17,28 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      build_iso:
+        description: 'Build the ISO (expensive, ~28 min)'
+        type: boolean
+        default: false
   workflow_call:
-
-
+    inputs:
+      build_iso:
+        description: 'Build the ISO (expensive, ~28 min)'
+        type: boolean
+        default: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: >-
+      ${{
+        startsWith(github.ref, 'refs/tags/v') ||
+        (github.event_name == 'workflow_dispatch' && inputs.build_iso) ||
+        (github.event_name == 'workflow_call' && inputs.build_iso) ||
+        (github.event_name == 'push' && (vars.MAGIC_STICK_BUILD_ISO == 'true' || contains(github.event.head_commit.message, '[build-iso]')))
+      }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
